@@ -1,4 +1,4 @@
-import {RevenueChart} from "@/components/RevenueChart";
+import {RevenueChart} from "@/app/components/RevenueChart";
 
 export default function Financials()   {
     return (

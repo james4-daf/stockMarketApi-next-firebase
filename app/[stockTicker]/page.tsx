@@ -2,10 +2,10 @@
 import { useStock } from "../hooks/useStock";
 import { useParams } from 'next/navigation'
 import {useEffect, useRef, useState} from "react";
-import {SearchBar} from "@/components/SearchBar";
+import {SearchBar} from "@/app/components/SearchBar";
 import Image from "next/image";
-import Financials from "@/components/Sections/Financials";
-import KeyFeatures from "@/components/KeyFeatures";
+import Financials from "@/app/components/Sections/Financials";
+import KeyFeatures from "@/app/components/KeyFeatures";
 export default function StockPage () {
 
     const {apiKey} = useStock();
@@ -52,7 +52,7 @@ export default function StockPage () {
 
     }, [stockTicker]);
     return (
-        <div className=''>
+        <div className='justify-center text-center p-8'>
             <SearchBar />
         <div
         className="p-8 text-center">

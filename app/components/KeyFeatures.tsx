@@ -1,3 +1,4 @@
+"use client"
 import {useEffect, useRef, useState} from "react";
 import {useStock} from "@/app/hooks/useStock";
 import {useParams} from "next/navigation";

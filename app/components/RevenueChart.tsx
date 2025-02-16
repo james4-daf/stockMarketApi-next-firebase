@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/app/components/ui/tabs"
 
 import {
     Card,
@@ -10,13 +10,13 @@ import {
     CardDescription,
     CardHeader,
     CardTitle,
-} from "@/components/ui/card"
+} from "@/app/components/ui/card"
 import {
     ChartConfig,
     ChartContainer,
     ChartTooltip,
     ChartTooltipContent,
-} from "@/components/ui/chart"
+} from "@/app/components/ui/chart"
 import {useEffect, useRef, useState} from "react";
 import {useStock} from "@/app/hooks/useStock";
 import {useParams} from "next/navigation";
@@ -141,14 +141,14 @@ export function RevenueChart() {
                             content={
                                 <ChartTooltipContent
                                     className="w-[150px]"
-                                    nameKey={chartConfig[activeChart].label}
-                                    labelFormatter={(value) => {
-                                        return new Date(value).toLocaleDateString("en-US", {
-                                            month: "short",
-                                            day: "numeric",
-                                            year: "numeric",
-                                        })
-                                    }}
+
+                                    // labelFormatter={(value) => {
+                                    //     return new Date(value).toLocaleDateString("en-US", {
+                                    //         month: "short",
+                                    //         day: "numeric",
+                                    //         year: "numeric",
+                                    //     })
+                                    // }}
                                 />
                             }
                         />
