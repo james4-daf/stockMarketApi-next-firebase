@@ -4,6 +4,8 @@ import { useParams } from 'next/navigation'
 import {useEffect, useRef, useState} from "react";
 import {SearchBar} from "@/components/SearchBar";
 import Image from "next/image";
+import Financials from "@/components/Sections/Financials";
+import KeyFeatures from "@/components/KeyFeatures";
 export default function StockPage () {
 
     const {apiKey} = useStock();
@@ -21,8 +23,6 @@ export default function StockPage () {
     } | null>(null);
 
     const fetched = useRef(false);
-
-
 
     useEffect(() => {
         if (!stockTicker || fetched.current) return;
@@ -47,7 +47,6 @@ export default function StockPage () {
             }
 
 
-
         }
         fetchStock()
 
@@ -64,7 +63,7 @@ export default function StockPage () {
     {
         error && <p className="text-red-500">Error: {error}</p>
     }
-            {!loading && (<div>
+            {!loading && (<div className='flex'>
                 <div className='flex justify-center items-center w-full'>
                     <div className='columns-2'>
             <>
@@ -82,13 +81,21 @@ export default function StockPage () {
                     <h2>{stockData?.companyName}</h2>
 
 
-
                 <p>Stock Price: ${stockData?.price}</p>
                 <p>Market Cap: {stockData?.mktCap}</p>
                 </div>
                     </div>
-            </div>)}
+
+
+            <div className='justify-center items-center w-full'>
+
+                  <KeyFeatures />
+            </div>
+        </div>)}
+
         </div>
+
+            <Financials />
         </div>
 )
 }
