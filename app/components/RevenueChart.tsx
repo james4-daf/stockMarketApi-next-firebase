@@ -70,7 +70,7 @@ export function RevenueChart() {
                     .sort((a, b) => a.date - b.date);
 
                 setRevenueData(extractedData);
-                console.log("revData",extractedData);
+                // console.log("revData",extractedData);
             } catch (error) {
                 setError(error instanceof Error ? error.message : "An error occurred.");
             } finally {

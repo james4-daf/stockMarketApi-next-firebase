@@ -6,7 +6,8 @@ import {
     signInWithPopup,
     signOut,
 } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import { getFirestore, collection, getDoc, doc } from "firebase/firestore";
+
 
 const firebaseConfig = {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -21,6 +22,54 @@ const firebaseConfig = {
 export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+
+
+
+// Import Firestore and other necessary methods from Firebase SDK
+
+
+// Initialize Firestore
+
+
+// Access a specific collection (for example, 'watchlist')
+// const watchlistRef = collection(db, "watchlist");
+
+// Example: Fetch documents from the 'watchlist' collection
+export const getWatchlistData = async (userId: string) => {
+    try {
+        // Reference to the user's watchlist document
+        const userWatchlistRef = doc(db, "watchlist", userId); // This points to the user's watchlist document
+        const docSnap = await getDoc(userWatchlistRef);
+
+        if (docSnap.exists()) {
+            // If the document exists, get the 'stocks' field (array of strings)
+            const stocks = docSnap.data().stocks; // Assuming 'stocks' is an array of strings
+            return stocks;
+        } else {
+            console.log("No such document!");
+            return [];
+        }
+    } catch (e) {
+        console.error("Error getting documents: ", e);
+        return [];
+    }
+};
+
+// Example: Add a new stock to the 'watchlist'
+// const addStockToWatchlist = async (userId, stock) => {
+//     try {
+//         const docRef = await addDoc(collection(db, "watchlist", userId, "stocks"), {
+//             stock: stock,
+//         });
+//         console.log("Document written with ID: ", docRef.id);
+//     } catch (e) {
+//         console.error("Error adding document: ", e);
+//     }
+// };
+
+// Call these functions as needed
+// getWatchlistData();
+// addStockToWatchlist("userId123", "AAPL");
 
 export const signInWithGoogle = async () => {
     try {

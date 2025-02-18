@@ -6,6 +6,7 @@ import {SearchBar} from "@/app/components/SearchBar";
 import Image from "next/image";
 import Financials from "@/app/components/Sections/Financials";
 import KeyFeatures from "@/app/components/KeyFeatures";
+import Watchlist from "@/app/components/Sections/Watchlist";
 export default function StockPage () {
 
     const {apiKey} = useStock();
@@ -108,6 +109,7 @@ export default function StockPage () {
         </div>
 
             <Financials/>
+            <Watchlist />
         </div>
     )
 }
