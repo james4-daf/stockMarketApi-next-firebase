@@ -2,6 +2,7 @@
 
 import {useAuth} from "@/app/hooks/useAuth";
 import Login from "@/app/components/Login";
+import Header from "@/app/components/Sections/Header";
 
 export default function StockLayout({
                                        children,
@@ -21,7 +22,7 @@ export default function StockLayout({
     return (
 
 <>
-
+<Header />
 
 
         {children}

@@ -45,8 +45,6 @@ export function RevenueChart() {
 
     const [activeChart, setActiveChart] = useState<keyof typeof chartConfig>("revenue");
 
-
-
     useEffect(() => {
         if (!stockTicker || fetched.current) return;
         fetched.current = true;
@@ -62,7 +60,7 @@ export function RevenueChart() {
                     throw new Error(`Error ${response.status}: ${response.statusText}`);
                 }
                 const json = await response.json();
-                console.log(json);
+                // console.log(json);
                 const extractedData = json
                     .map(({ date, revenue, epsdiluted }) => ({
                         date: new Date(date).getFullYear(), // Extract only the year
@@ -72,6 +70,7 @@ export function RevenueChart() {
                     .sort((a, b) => a.date - b.date);
 
                 setRevenueData(extractedData);
+                console.log("revData",extractedData);
             } catch (error) {
                 setError(error instanceof Error ? error.message : "An error occurred.");
             } finally {

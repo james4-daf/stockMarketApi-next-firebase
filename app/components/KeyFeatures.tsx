@@ -33,7 +33,7 @@ export default function KeyFeatures() {
                     throw new Error(`Error ${response.status}: ${response.statusText}`);
                 }
                 const json = await response.json();
-                console.log(json);
+                // console.log(json);
                 const { peRatioTTM,dividendYielPercentageTTM } = json[0];
                 setKeyFeaturesData({ peRatioTTM,dividendYielPercentageTTM});
             } catch (error) {
