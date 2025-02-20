@@ -1,58 +1,99 @@
-"use client"
 
-import {
-    Command,
-    CommandEmpty,
-    CommandGroup,
-    CommandInput,
-    CommandItem,
-    CommandList,
-    CommandSeparator,
-    CommandShortcut,
-} from "@/app/components/ui/command"
-import {useState} from "react";
-import {useRouter} from "next/navigation";
+"use client";
 
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export function SearchBar() {
-    const [searchText, setSearchText] = useState<string>("");
-    const router = useRouter()
-    const [error, setError] = useState<string | null>(null);
-    const stockSearch= (e?: React.FormEvent | KeyboardEvent) => {
-        if (e) e.preventDefault();
+    const [searchText, setSearchText] = useState("");
+    const [suggestions, setSuggestions] = useState([]);
+    const [error, setError] = useState(null);
+    const router = useRouter();
+
+    useEffect(() => {
         if (!searchText.trim()) {
-            setError('Ticker cannot be empty.');
+            setSuggestions([]);
             return;
         }
-        router.push(`/${searchText?.trim()}`)
-        setSearchText("")
-    }
+
+        const fetchSuggestions = async () => {
+            try {
+                const response = await fetch(
+                    `https://financialmodelingprep.com/api/v3/search?query=${searchText}&limit=5&apikey=jJ6qjIpqz9YhG37RiQryCslB8gxmjxrD`
+                );
+                if (!response.ok) throw new Error("Failed to fetch suggestions");
+                const data = await response.json();
+                setSuggestions(data);
+            } catch (err) {
+                setError("Error fetching suggestions");
+            }
+        };
+
+        const debounceTimer = setTimeout(fetchSuggestions, 300);
+        return () => clearTimeout(debounceTimer);
+    }, [searchText]);
+
+    const stockSearch = (e) => {
+        e.preventDefault();
+        if (!searchText.trim()) {
+            setError("Ticker cannot be empty.");
+            return;
+        }
+        router.push(`/${searchText.trim()}`);
+        setSearchText("");
+        setSuggestions([]);
+    };
+
     return (
-        <div className=''>
+        <div className="relative">
+            <form onSubmit={stockSearch} className='flex'>
 
-            <form onSubmit={stockSearch}>
+                <div className="relative w-[300px] ">
+                    <input
+                        className="p-6 border-2 border-indigo-600 rounded-md w-full pr-10"
+                        value={searchText}
+                        type="text"
+                        placeholder="Enter a stock ticker e.g. TSLA"
+                        onChange={(e) => setSearchText(e.target.value)}
+                    />
+                    {searchText && (
+                        <button
+                            type="button"
+                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-black"
+                            onClick={() => {
 
-            <input className='p-6 border-2 border-indigo-600 rounded-md w-[300px]' value={searchText}
-                          type={'text'}
-                          placeholder="Enter a stock ticker e.g tsla"
-                   onChange={(e) => setSearchText(e.target.value)}
-                          // onChange={(e) => setSearchText(e.target.value)}
-                          onKeyDown={(e) => {
-                              if (e.key === "Enter") {
-                                  stockSearch(e);
-                              }
-                          }}
-            />
-                {/* ✅ Ensure CommandList is only rendered if searchText exists */}
-                {/*{searchText.length > 0 ? (*/}
-                {/*    <CommandList>*/}
-                {/*        <CommandEmpty>No results found.</CommandEmpty>*/}
-                {/*    </CommandList>*/}
-                {/*) : null}*/}
-                <button type="submit" className='p-2'>Search</button>
+                                setSearchText("")
+                        setSuggestions(null)
+                            }
+                            }
+                        >
+                            ❌
+                        </button>
+                    )}
+                </div>
+                <button type="submit" className="p-2">Search</button>
             </form>
 
-    {error && <div className="text-red-500">{error}</div>}
+            {suggestions?.length > 0 && (
+                <ul className="absolute bg-white border border-gray-300 w-[300px] mt-1 rounded-md shadow-lg">
+                    {suggestions.map((stock) => (
+                        <li
+                            key={stock.symbol}
+                            className="p-2 hover:bg-gray-100 cursor-pointer"
+                            onClick={() => {
+                                router.push(`/${stock.symbol}`);
+                                setSearchText("");
+                                setSuggestions([]);
+                            }}
+                        >
+                            {stock.symbol} - {stock.name}
+                        </li>
+                    ))}
+                </ul>
+            )}
+
+            {error && <div className="text-red-500 mt-2">{error}</div>}
         </div>
-    )
+    );
 }
+

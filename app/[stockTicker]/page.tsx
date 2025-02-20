@@ -132,7 +132,7 @@ export default function StockPage () {
 
 
                         <p>Stock Price: ${stockData?.price}</p>
-                        <p>Market Cap: {stockData?.mktCap}</p>
+                        <p>Market Cap: ${stockData?.mktCap / 1e9}B</p>
 
                             <button className='flex pe-1' onClick={toggleWatchlist}>
 
