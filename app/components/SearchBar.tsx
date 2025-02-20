@@ -3,8 +3,10 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import {useStock} from "@/app/hooks/useStock";
 
 export function SearchBar() {
+    const { apiKey } = useStock();
     const [searchText, setSearchText] = useState("");
     const [suggestions, setSuggestions] = useState([]);
     const [error, setError] = useState(null);
@@ -19,7 +21,7 @@ export function SearchBar() {
         const fetchSuggestions = async () => {
             try {
                 const response = await fetch(
-                    `https://financialmodelingprep.com/api/v3/search?query=${searchText}&limit=5&apikey=jJ6qjIpqz9YhG37RiQryCslB8gxmjxrD`
+                    `https://financialmodelingprep.com/api/v3/search?query=${searchText}&limit=5&apikey=${apiKey}`
                 );
                 if (!response.ok) throw new Error("Failed to fetch suggestions");
                 const data = await response.json();

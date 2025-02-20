@@ -7,7 +7,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/app/components/ui/ta
 import {
     Card,
     CardContent,
-    CardDescription,
     CardHeader,
     CardTitle,
 } from "@/app/components/ui/card"
@@ -78,7 +77,7 @@ export function RevenueChart() {
             }
         };
 
-        fetchStockData("annual");
+        fetchStockData();
     }, [stockTicker, activeChart]);
     return (
         <Tabs onValueChange={() => setActiveChart("revenue")} defaultValue="Annual" className="w-full text-center">

@@ -6,8 +6,7 @@ import {
     signInWithPopup,
     signOut,
 } from 'firebase/auth';
-import { getFirestore, collection, getDoc, doc } from "firebase/firestore";
-
+import { getFirestore, getDoc, doc } from "firebase/firestore";
 
 const firebaseConfig = {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,

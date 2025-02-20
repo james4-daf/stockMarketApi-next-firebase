@@ -6,7 +6,7 @@ import Image from "next/image";
 import Financials from "@/app/components/Sections/Financials";
 import KeyFeatures from "@/app/components/KeyFeatures";
 import Watchlist from "@/app/components/Sections/Watchlist";
-import {addDoc, collection, doc, deleteDoc, getDocs, where, query, getDoc,updateDoc, setDoc} from "firebase/firestore";
+import { doc,  getDoc,updateDoc, setDoc} from "firebase/firestore";
 import {db} from "@/app/firebase/firebase";
 import {useAuth} from "@/app/hooks/useAuth";
 
@@ -56,7 +56,7 @@ export default function StockPage () {
         }
         fetchStock()
 
-    }, [stockTicker]);
+    }, [stockTicker, apiKey]);
 
 
 
