@@ -2,13 +2,17 @@
 import { useStock } from "../hooks/useStock";
 import { useParams } from 'next/navigation'
 import {useEffect, useRef, useState} from "react";
-import {SearchBar} from "@/app/components/SearchBar";
 import Image from "next/image";
 import Financials from "@/app/components/Sections/Financials";
 import KeyFeatures from "@/app/components/KeyFeatures";
 import Watchlist from "@/app/components/Sections/Watchlist";
-export default function StockPage () {
+import {addDoc, collection, doc, deleteDoc, getDocs, where, query, getDoc,updateDoc, setDoc} from "firebase/firestore";
+import {db} from "@/app/firebase/firebase";
+import {useAuth} from "@/app/hooks/useAuth";
 
+
+export default function StockPage () {
+    const {user}  = useAuth();
     const {apiKey} = useStock();
 
     const params = useParams<{ stockTicker: string; }>()
@@ -53,6 +57,52 @@ export default function StockPage () {
         fetchStock()
 
     }, [stockTicker]);
+
+
+
+    useEffect(() => {
+        if (!user?.uid || !stockTicker) return;
+
+        const checkWatchlist = async () => {
+            try {
+                const watchlistRef = doc(db, "watchlist", user.uid);
+                const watchlistSnap = await getDoc(watchlistRef);
+
+                if (watchlistSnap.exists()) {
+                    const stocks = watchlistSnap.data().stocks || [];
+                    setInWatchlist(stocks.includes(stockTicker));
+                }
+            } catch (error) {
+                console.error("Error checking watchlist:", error);
+            }
+        };
+
+        checkWatchlist();
+    }, [user, stockTicker]);
+
+    const toggleWatchlist = async () => {
+        if (!user?.uid || !stockTicker) return;
+
+        const watchlistRef = doc(db, "watchlist", user.uid);
+
+        try {
+            const watchlistSnap = await getDoc(watchlistRef);
+            if (watchlistSnap.exists()) {
+                const stocks = watchlistSnap.data().stocks || [];
+                const updatedStocks = inWatchlist
+                    ? stocks.filter(stock => stock !== stockTicker) // Remove stock
+                    : [...stocks, stockTicker]; // Add stock
+
+                await updateDoc(watchlistRef, { stocks: updatedStocks });
+                setInWatchlist(!inWatchlist);
+            } else {
+                await setDoc(watchlistRef, { stocks: [stockTicker] }); // Create document if missing
+                setInWatchlist(true);
+            }
+        } catch (error) {
+            console.error("Error updating watchlist:", error);
+        }
+    };
     return (
         <div className=''>
         <div className="p-8 text-center">
@@ -84,7 +134,7 @@ export default function StockPage () {
                         <p>Stock Price: ${stockData?.price}</p>
                         <p>Market Cap: {stockData?.mktCap}</p>
 
-                            <button className='flex pe-1' onClick={() => {setInWatchlist(prev => !prev)}}>
+                            <button className='flex pe-1' onClick={toggleWatchlist}>
 
                             <svg xmlns="http://www.w3.org/2000/svg" fill={inWatchlist ? "currentColor" : "none"} viewBox="0 0 24 24" strokeWidth={1.5}
                                  stroke="currentColor" className="size-6">

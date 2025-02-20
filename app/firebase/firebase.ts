@@ -24,13 +24,6 @@ export const auth = getAuth(app);
 export const db = getFirestore(app);
 
 
-
-// Import Firestore and other necessary methods from Firebase SDK
-
-
-// Initialize Firestore
-
-
 // Access a specific collection (for example, 'watchlist')
 // const watchlistRef = collection(db, "watchlist");
 
@@ -54,6 +47,8 @@ export const getWatchlistData = async (userId: string) => {
         return [];
     }
 };
+
+
 
 // Example: Add a new stock to the 'watchlist'
 // const addStockToWatchlist = async (userId, stock) => {

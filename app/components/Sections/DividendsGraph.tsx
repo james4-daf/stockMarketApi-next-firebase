@@ -51,7 +51,7 @@ export function DividendsGraph() {
                     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()); // Sort oldest to newest
 
                 setDividendsData(extractedData);
-                console.log(extractedData);
+                // console.log(extractedData);
             } catch (error) {
                 setError(error instanceof Error ? error.message : "An error occurred.");
             } finally {

@@ -1,6 +1,7 @@
 import { useAuth } from "@/app/hooks/useAuth";
 import { getWatchlistData } from "@/app/firebase/firebase";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 export default function Watchlist() {
     const { user, loading } = useAuth();
@@ -24,10 +25,15 @@ export default function Watchlist() {
     }, [user]);
 
     return (
+        <div>
+            <h2 className='text-xl'>Watchlist</h2>
+
         <ul>
             {watchlistStocks.map((stockTicker, index) => (
-                <li key={index}>{stockTicker}</li> // Added key for each list item
+                <li key={index}>
+                    <Link href={`/${stockTicker}`}>{stockTicker}</Link></li> // Added key for each list item
             ))}
         </ul>
+        </div>
     );
 }
