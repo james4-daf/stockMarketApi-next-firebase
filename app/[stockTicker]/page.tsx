@@ -9,6 +9,7 @@ import Watchlist from "@/app/components/Sections/Watchlist";
 import { doc,  getDoc,updateDoc, setDoc} from "firebase/firestore";
 import {db} from "@/app/firebase/firebase";
 import {useAuth} from "@/app/hooks/useAuth";
+import CompanyReports from "@/app/components/Sections/CompanyReports";
 
 
 export default function StockPage () {
@@ -160,6 +161,7 @@ export default function StockPage () {
 
             <Financials/>
             <Watchlist />
+            <CompanyReports />
         </div>
     )
 }
