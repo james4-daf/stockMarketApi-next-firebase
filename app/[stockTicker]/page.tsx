@@ -1,6 +1,7 @@
 'use client'
 import { useStock } from "../hooks/useStock";
 import { useParams } from 'next/navigation'
+import { notFound } from "next/navigation";
 import {useEffect, useRef, useState} from "react";
 import Image from "next/image";
 import Financials from "@/app/components/Sections/Financials";
@@ -44,6 +45,10 @@ export default function StockPage () {
                 throw new Error(`Error ${response.status}: ${response.statusText}`);
             }
             const json = await response.json();
+            if (!json || json.length === 0) {
+                notFound();  // ❌ Triggers Next.js 404 page
+                return;
+            }
             const { symbol, mktCap, price,image,companyName } = json[0];
             setStockData({ symbol, mktCap, price,image,companyName });
             } catch (error) {
@@ -55,6 +60,7 @@ export default function StockPage () {
 
 
         }
+        // if (error || !stockData) return notFound();
         fetchStock()
 
     }, [stockTicker, apiKey]);
@@ -111,6 +117,7 @@ export default function StockPage () {
     {
         loading && <p>Loading stock data...</p>
     }
+
     {
         error && <p className="text-red-500">Error: {error}</p>
     }

@@ -27,7 +27,11 @@ export default function CompanyReports() {
                 );
                 const profileData = await profileRes.json();
 
-                if (!profileData.length) throw new Error("Company not found.");
+                // if (!profileData.length) throw new Error("Company not found.");
+                if (!profileData.length) {
+                    console.error("Company not found.");
+                    return; // Avoid throwing an error
+                }
                 const cik = profileData[0].cik;
                 console.log(cik);
 
