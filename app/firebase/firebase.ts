@@ -80,7 +80,8 @@ export const signOutFromGoogle = async () => {
     try {
         await signOut(auth);
 
-        window.alert('Signed out!');
+        // window.alert('Signed out!');
+
     } catch (e) {
         window.alert(e.message);
     }

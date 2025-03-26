@@ -1,7 +1,7 @@
 import { useAuth } from "@/app/hooks/useAuth";
 import { getWatchlistData } from "@/app/firebase/firebase";
 import { useEffect, useRef, useState } from "react";
-import { Progress } from "@/components/ui/progress"
+import { Progress } from "@/app/components/ui/progress"
 
 import Link from "next/link";
 import {
@@ -11,7 +11,7 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from "@/components/ui/table";
+} from "@/app/components/ui/table";
 import { useStock } from "@/app/hooks/useStock";
 
 export default function Watchlist() {
