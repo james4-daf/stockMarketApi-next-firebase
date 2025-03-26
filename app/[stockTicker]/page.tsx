@@ -111,8 +111,8 @@ export default function StockPage () {
         }
     };
     return (
-        <div className=''>
-        <div className="p-8 text-center">
+        <div className='p-8 '>
+        <div className="text-center">
 
     {
         loading && <p>Loading stock data...</p>

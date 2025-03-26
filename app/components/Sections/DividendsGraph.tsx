@@ -24,6 +24,7 @@ export function DividendsGraph() {
     const fetched = useRef(false);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const [hasDividend, setHasDividend] = useState(false);
     const [activeChart, setActiveChart] = useState<keyof typeof chartConfig>("dividends");
 
     useEffect(() => {
@@ -51,7 +52,11 @@ export function DividendsGraph() {
                     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()); // Sort oldest to newest
 
                 setDividendsData(extractedData);
-                // console.log(extractedData);
+                // console.log("dividend",extractedData);
+                // if(!extractedData) {
+                //
+                // }
+                 console.log("dividend",dividendsData);
             } catch (error) {
                 setError(error instanceof Error ? error.message : "An error occurred.");
             } finally {
@@ -107,7 +112,7 @@ export function DividendsGraph() {
     const totalPercentageGain10y = calculateTotalPercentageGain(dividendsData, 10);
 
 
-    return (
+    return dividendsData.length >0 && (
         <>
             <Card>
                 <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row">

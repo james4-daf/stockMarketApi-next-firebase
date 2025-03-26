@@ -81,7 +81,7 @@ console.log(json);
     }, [watchlistStocks, apiKey]);
 
     return (
-        <div>
+        <div className='p-4'>
             <h2 className='text-xl font-bold'>Watchlist</h2>
 
             <Table>
