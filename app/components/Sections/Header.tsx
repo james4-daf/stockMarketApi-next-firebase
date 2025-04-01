@@ -11,16 +11,8 @@ export default function Header() {
 
             <SearchBar />
             </div>
-            {user && (
-                <div className="col-span-2 col-start-11    ">
-                    <button
-                        onClick={signOutFromGoogle}
-                        className="px-4 py-2 bg-red-500 text-white rounded-md"
-                    >
-                        Logout
-                    </button>
-                </div>
-            )}
+
+
         </div>
     )
 }

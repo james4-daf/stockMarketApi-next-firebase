@@ -6,7 +6,7 @@ import Image from "next/image";
 export default function Login() {
 
     return (
-        <div className="h-screen flex flex-col items-center justify-center text-center">
+        <div className=" flex flex-col items-center justify-center text-center p-14">
         <h1 className="mb-4 text-lg font-semibold">Please sign in to view content</h1>
     <button
     onClick={signInWithGoogle}

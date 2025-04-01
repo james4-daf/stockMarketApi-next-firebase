@@ -1,3 +1,4 @@
+"use client"
 import { Eye, Search, UserCog } from "lucide-react"
 
 import {
@@ -14,6 +15,9 @@ import {
 
 } from "../ui/sidebar"
 import Image from "next/image";
+import {signOutFromGoogle} from "@/app/firebase/firebase";
+import {useAuth} from "@/app/hooks/useAuth";
+import { useRouter } from "next/navigation";
 
 // Menu items.
 const items = [
@@ -35,6 +39,14 @@ const items = [
 ]
 
 export function AppSidebar() {
+    const {user}  = useAuth();
+    const router = useRouter();
+
+
+    const handleLogout = async () => {
+        await signOutFromGoogle();
+        router.push("/"); // Redirect to home after logout
+    };
     return (
         <Sidebar>
             <SidebarHeader>
@@ -70,6 +82,18 @@ export function AppSidebar() {
                     </SidebarGroupContent>
                 </SidebarGroup>
             </SidebarContent>
+            <SidebarFooter>
+                {user && (
+                    <div className="mb-6  ">
+                        <button
+                            onClick={handleLogout}
+                            className="px-4 py-2 bg-red-500 text-white rounded-md"
+                        >
+                            Logout
+                        </button>
+                    </div>
+                )}
+            </SidebarFooter >
         </Sidebar>
     )
 }

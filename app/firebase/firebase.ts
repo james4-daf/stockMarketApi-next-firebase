@@ -82,6 +82,7 @@ export const signOutFromGoogle = async () => {
 
         // window.alert('Signed out!');
 
+
     } catch (e) {
         window.alert(e.message);
     }

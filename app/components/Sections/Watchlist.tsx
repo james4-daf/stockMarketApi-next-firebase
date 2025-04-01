@@ -98,10 +98,10 @@ console.log(json);
 
                         <TableRow key={index}>
                             <TableCell className="font-medium">
-                                <Link href={`/${stockTicker}`}>{stockTicker}</Link>
+                                <Link href={`/${stockTicker.toUpperCase()}`}>{stockTicker.toUpperCase()}</Link>
                             </TableCell>
-                            <TableCell>${stockData[stockTicker]?.price ?? "Loading..."}</TableCell>
-                            <TableCell>{stockData[stockTicker]?.changePercentage ?? "Loading..."}%</TableCell>
+                            <TableCell >${stockData[stockTicker]?.price ?? "Loading..."}</TableCell>
+                            <TableCell className={stockData[stockTicker]?.changePercentage >= 0 ? "text-green-600" : "text-red-500"}>{stockData[stockTicker]?.changePercentage.toFixed(2) ?? "Loading..."}%</TableCell>
                             <TableCell className="text-right">{stockData[stockTicker]?.range ?? "Loading..."}
                                 <Progress value={stockData[stockTicker]?.progress ?? 0} />
                             </TableCell>
