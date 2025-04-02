@@ -67,12 +67,11 @@ export const getWatchlistData = async (userId: string) => {
 
 export const signInWithGoogle = async () => {
     try {
-        const result = await signInWithPopup(auth, new GoogleAuthProvider());
-        const user = result.user;
+         await signInWithPopup(auth, new GoogleAuthProvider());
 
         // window.alert(`Signed in with ${user.email}`);
     } catch (e) {
-        window.alert(e.message);
+        window.alert((e as Error).message);
     }
 };
 
@@ -84,6 +83,6 @@ export const signOutFromGoogle = async () => {
 
 
     } catch (e) {
-        window.alert(e.message);
+        window.alert((e as Error).message);
     }
 };

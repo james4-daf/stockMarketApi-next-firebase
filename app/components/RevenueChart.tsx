@@ -32,6 +32,12 @@ const chartConfig = {
 } satisfies ChartConfig
 
 
+type fundamentalDataTypes ={
+    date: string,
+    revenue: number,
+    epsdiluted: number,
+}
+
 export function RevenueChart() {
     const {apiKey} = useStock();
 
@@ -61,7 +67,7 @@ export function RevenueChart() {
                 const json = await response.json();
                 // console.log(json);
                 const extractedData = json
-                    .map(({ date, revenue, epsdiluted }) => ({
+                    .map(({ date, revenue, epsdiluted }:(fundamentalDataTypes)) => ({
                         date: new Date(date).getFullYear(), // Extract only the year
                         revenue: revenue / 1e9, // Convert to billions
                         epsdiluted,
@@ -78,7 +84,7 @@ export function RevenueChart() {
         };
 
         fetchStockData();
-    }, [stockTicker, activeChart]);
+    }, [stockTicker, activeChart, apiKey]);
     return (
         <Tabs onValueChange={() => setActiveChart("revenue")} defaultValue="Annual" className="w-full text-center">
             <TabsList >
@@ -87,6 +93,8 @@ export function RevenueChart() {
                 <TabsTrigger value="Cash Flow">Cash Flow</TabsTrigger>
             </TabsList>
             <TabsContent value="Annual">
+                {loading && <p>Loading...</p>}
+                {error && <p className="text-red-500">Error: {error}</p>}
         <Card>
             <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row">
                 <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:py-6">

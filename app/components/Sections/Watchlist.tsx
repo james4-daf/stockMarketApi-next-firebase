@@ -14,12 +14,17 @@ import {
 } from "@/app/components/ui/table";
 import { useStock } from "@/app/hooks/useStock";
 
+type UserType = {
+    uid: string;
+
+}
+
 export default function Watchlist() {
-    const { user } = useAuth();
+    const { user } = useAuth() as {user: UserType | null};
     const { apiKey } = useStock();
 
     const [watchlistStocks, setWatchlistStocks] = useState<string[]>([]);
-    const [stockData, setStockData] = useState<Record<string, { price: number; changePercentage: number; range: string }>>({});
+    const [stockData, setStockData] = useState<Record<string, { price: number; changePercentage: number; range: string,progress:number }>>({});
     const fetched = useRef(new Set<string>()); // Track fetched stocks
 
     useEffect(() => {

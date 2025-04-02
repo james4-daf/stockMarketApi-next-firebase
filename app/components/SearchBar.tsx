@@ -5,11 +5,17 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {useStock} from "@/app/hooks/useStock";
 
+
+type SearchBarStocks = {
+    symbol: string;
+    name: string;
+}
+
 export function SearchBar() {
     const { apiKey } = useStock();
     const [searchText, setSearchText] = useState("");
-    const [suggestions, setSuggestions] = useState([]);
-    const [error, setError] = useState(null);
+    const [suggestions, setSuggestions] = useState<SearchBarStocks[]>([]);
+    const [error, setError] = useState<string | null>(null);
     const router = useRouter();
 
     useEffect(() => {
@@ -27,13 +33,13 @@ export function SearchBar() {
                 const data = await response.json();
                 setSuggestions(data);
             } catch (err) {
-                setError("Error fetching suggestions");
+                setError(`Error fetching suggestions, ${err}`);
             }
         };
 
         const debounceTimer = setTimeout(fetchSuggestions, 300);
         return () => clearTimeout(debounceTimer);
-    }, [searchText]);
+    }, [searchText,apiKey]);
 
     const stockSearch = (e) => {
         e.preventDefault();
@@ -65,7 +71,7 @@ export function SearchBar() {
                             onClick={() => {
 
                                 setSearchText("")
-                        setSuggestions(null)
+                        setSuggestions([])
                             }
                             }
                         >
@@ -78,7 +84,7 @@ export function SearchBar() {
 
             {suggestions?.length > 0 && (
                 <ul className="absolute bg-white border border-gray-300 w-[300px] mt-1 rounded-md shadow-lg">
-                    {suggestions.map((stock) => (
+                    {suggestions.map((stock:SearchBarStocks) => (
                         <li
                             key={stock.symbol}
                             className="p-2 hover:bg-gray-100 cursor-pointer"

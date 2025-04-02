@@ -84,7 +84,7 @@ export default function CompanyReports() {
         };
 
         fetchReports();
-    }, [stockTicker]);
+    }, [stockTicker, apiKey]);
 
     // Helper function to group reports by year
     const groupByYear = (reports: any[]) => {

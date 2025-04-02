@@ -3,6 +3,14 @@ import {useEffect, useRef, useState} from "react";
 import {useStock} from "@/app/hooks/useStock";
 import {useParams} from "next/navigation";
 
+
+interface KeyFeatures {
+    loading: boolean;
+    error: null | string;
+    peRatioTTM: number;
+    dividendYielPercentageTTM: number;
+}
+
 export default function KeyFeatures() {
     const {apiKey} = useStock();
     const params = useParams<{ stockTicker: string; }>()
@@ -44,12 +52,18 @@ export default function KeyFeatures() {
         };
 
         fetchKeyFeatureStockData();
-    }, [stockTicker]);
+    }, [stockTicker, apiKey]);
     return (
         <section>
             <h2 className='text-xl'>Key Features</h2>
-            <p>TTM PE: {Math.round(keyFeaturesData?.peRatioTTM *100) / 100}</p>
-            <p>Div Yield: {Math.round(keyFeaturesData?.dividendYielPercentageTTM * 100) / 100}%</p>
+            {loading && <p>Loading...</p>}
+            {error && <p className="text-red-500">Error: {error}</p>}
+            {keyFeaturesData && (
+                <>
+                    <p>TTM PE: {Math.round(keyFeaturesData?.peRatioTTM *100) / 100}</p>
+                    <p>Div Yield: {Math.round(keyFeaturesData?.dividendYielPercentageTTM * 100) / 100}%</p>
+                </>
+            )}
         </section>
     )
 }

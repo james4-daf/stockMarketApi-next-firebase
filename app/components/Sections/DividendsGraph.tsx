@@ -15,6 +15,11 @@ const chartConfig = {
     },
 } satisfies ChartConfig;
 
+
+type DividendsDataTypes = {
+    date: string,
+    dividend: number,
+}
 export function DividendsGraph() {
     const { apiKey } = useStock();
     const params = useParams<{ stockTicker: string }>();
@@ -24,7 +29,6 @@ export function DividendsGraph() {
     const fetched = useRef(false);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
-    const [hasDividend, setHasDividend] = useState(false);
     const [activeChart, setActiveChart] = useState<keyof typeof chartConfig>("dividends");
 
     useEffect(() => {
@@ -44,7 +48,7 @@ export function DividendsGraph() {
                 const json = await response.json();
 
                 const extractedData = json.historical
-                    .map(({ date, dividend }) => ({
+                    .map(({ date, dividend }:DividendsDataTypes) => ({
                         date, // Keep the full date
                         year: new Date(date).getFullYear(), // Extract year for better chart labels
                         dividend,
@@ -65,7 +69,7 @@ export function DividendsGraph() {
         };
 
         fetchDividendsData();
-    }, [stockTicker]);
+    }, [stockTicker,apiKey, dividendsData]);
 // Function to calculate the average percentage increase over n years
     const calculateAvgIncrease = (data: Array<{ year: number, dividend: number }>, years: number) => {
         if (data.length < years) return null;
@@ -114,6 +118,8 @@ export function DividendsGraph() {
 
     return dividendsData.length >0 && (
         <>
+            {loading && <p>Loading...</p>}
+            {error && <p className="text-red-500">Error: {error}</p>}
             <Card>
                 <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row">
                     <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:py-6">
@@ -188,7 +194,7 @@ export function DividendsGraph() {
                     )
                         .sort(([a], [b]) => Number(b) - Number(a)) // Sort years descending
                         .map(([year, total], index, arr) => {
-                            const prevYear = arr[index + 1]?.[0]; // Get previous year
+                            // const prevYear = arr[index + 1]?.[0]; // Get previous year
                             const prevTotal = arr[index + 1]?.[1]; // Get previous year’s total
 
                             const hasFullYear = dividendsData.filter(d => d.year === Number(year)).length === 4;
@@ -199,7 +205,7 @@ export function DividendsGraph() {
                             return (
                                 <li key={year} className="text-sm">
                                     <strong>{year}:</strong> {total.toFixed(2)}
-                                    {!hasFullYear ? " (not full year)" : prevTotal ? ` (${percentageChange.toFixed(1)}% ${percentageChange > 0 ? "increase" : "decrease"})` : ""}
+                                    {!hasFullYear ? " (not full year)" : prevTotal ? ` (${percentageChange?.toFixed(1)}% ${percentageChange > 0 ? "increase" : "decrease"})` : ""}
                                 </li>
                             );
                         })}

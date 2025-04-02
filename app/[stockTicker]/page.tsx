@@ -135,12 +135,15 @@ export default function StockPage () {
                             <p>Ticker: {stockData?.symbol}</p>
                         </>
 
+                        {stockData && (
+                            <>
+                            <h2>{stockData?.companyName}</h2>
 
-                        <h2>{stockData?.companyName}</h2>
 
-
-                        <p>Stock Price: ${stockData?.price}</p>
-                        <p>Market Cap: ${stockData?.mktCap / 1e9}B</p>
+                            <p>Stock Price: ${stockData?.price}</p>
+                            <p>Market Cap: ${stockData?.mktCap / 1e9}B</p>
+                            </>
+                        )}
 
                             <button className='flex pe-1' onClick={toggleWatchlist}>
 
