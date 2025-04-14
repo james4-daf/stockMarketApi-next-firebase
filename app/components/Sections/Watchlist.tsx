@@ -1,8 +1,7 @@
 import { useAuth } from "@/app/hooks/useAuth";
 import { getWatchlistData } from "@/app/firebase/firebase";
 import { useEffect, useRef, useState } from "react";
-import { Progress } from "@/app/components/ui/progress"
-
+import { Progress } from "@/app/components/ui/progress";
 import Link from "next/link";
 import {
     Table,
@@ -13,10 +12,10 @@ import {
     TableRow,
 } from "@/app/components/ui/table";
 import { useStock } from "@/app/hooks/useStock";
+import { ChevronUp, ChevronDown } from "lucide-react"; // Add at top with other imports
 
 type UserType = {
     uid: string;
-
 }
 
 export default function Watchlist() {
@@ -24,8 +23,30 @@ export default function Watchlist() {
     const { apiKey } = useStock();
 
     const [watchlistStocks, setWatchlistStocks] = useState<string[]>([]);
-    const [stockData, setStockData] = useState<Record<string, { price: number; changePercentage: number; range: string,progress:number }>>({});
+    const [stockData, setStockData] = useState<Record<string, { price: number; changePercentage: number; range: string, progress: number }>>({});
     const fetched = useRef(new Set<string>()); // Track fetched stocks
+    const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
+    const [sortedStocks, setSortedStocks] = useState<string[]>([]);
+
+    const sortStocks = (direction: "asc" | "desc") => {
+        const sorted = [...watchlistStocks].sort((a, b) => {
+            const changeA = stockData[a]?.changePercentage ?? 0;
+            const changeB = stockData[b]?.changePercentage ?? 0;
+            return direction === "asc" ? changeA - changeB : changeB - changeA;
+        });
+        setSortedStocks(sorted);
+        setSortDirection(direction);
+    };
+
+    useEffect(() => {
+        if (watchlistStocks.length > 0) {
+            sortStocks("desc");
+        }
+    }, [watchlistStocks, stockData]);
+
+    useEffect(() => {
+        sortStocks("desc");
+    }, []);
 
     useEffect(() => {
         if (user?.uid) {
@@ -40,6 +61,11 @@ export default function Watchlist() {
             getWatchlist();
         }
     }, [user]);
+
+    const handleSort = () => {
+        const direction = sortDirection === "asc" ? "desc" : "asc";
+        sortStocks(direction);
+    };
 
     useEffect(() => {
         if (watchlistStocks.length === 0) return;
@@ -59,7 +85,7 @@ export default function Watchlist() {
 
                 const json = await response.json();
                 if (!json || json.length === 0) return;
-console.log(json);
+
                 const { price, changePercentage, range } = json[0]; // Grab only the required fields
                 // Parse the range "121-141" into min and max
                 const [low, high] = range.split("-").map(Number);
@@ -71,10 +97,9 @@ console.log(json);
                     progress = Math.max(0, Math.min(100, progress)); // Clamp between 0 and 100
                 }
 
-
                 setStockData(prevData => ({
                     ...prevData,
-                    [stockTicker]: { price, changePercentage: changePercentage, range,progress }
+                    [stockTicker]: { price, changePercentage: changePercentage, range, progress }
                 }));
 
             } catch (error) {
@@ -94,18 +119,24 @@ console.log(json);
                     <TableRow>
                         <TableHead className="w-[100px]">Ticker</TableHead>
                         <TableHead>Price</TableHead>
-                        <TableHead>Daily Change %</TableHead>
+                        <TableHead className="cursor-pointer" onClick={handleSort}>
+                            Daily Change %
+                            {sortDirection === "desc" ? (
+                                <ChevronDown className="inline-block w-4 h-4 ml-1" />
+                            ) : (
+                                <ChevronUp className="inline-block w-4 h-4 ml-1" />
+                            )}
+                        </TableHead>
                         <TableHead className="text-right">52 Week Range</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {watchlistStocks.map((stockTicker, index) => (
-
+                    {sortedStocks.map((stockTicker, index) => (
                         <TableRow key={index}>
                             <TableCell className="font-medium">
                                 <Link href={`/${stockTicker.toUpperCase()}`}>{stockTicker.toUpperCase()}</Link>
                             </TableCell>
-                            <TableCell >${stockData[stockTicker]?.price ?? "Loading..."}</TableCell>
+                            <TableCell >${stockData[stockTicker]?.price.toFixed(2) ?? "Loading..."}</TableCell>
                             <TableCell className={stockData[stockTicker]?.changePercentage >= 0 ? "text-green-600" : "text-red-500"}>{stockData[stockTicker]?.changePercentage.toFixed(2) ?? "Loading..."}%</TableCell>
                             <TableCell className="text-right">{stockData[stockTicker]?.range ?? "Loading..."}
                                 <Progress value={stockData[stockTicker]?.progress ?? 0} />

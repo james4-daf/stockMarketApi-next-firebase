@@ -4,12 +4,28 @@ import { useStock } from "@/app/hooks/useStock";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import {FileText} from "lucide-react";
 
+
+type Report = {
+    date: string;
+    url: string;
+    form: string
+    accessionNumber: string;
+    primaryDocument: string;
+};
+
+type GroupedReports = {
+    [year: string]: {
+        tenQ: Report[];
+        tenK: Report[];
+    };
+};
+
 export default function CompanyReports() {
     const { apiKey } = useStock();
     const params = useParams<{ stockTicker: string; }>();
     const { stockTicker } = params; // Get stock ticker from URL
-    const [tenKReports, setTenKReports] = useState([]);
-    const [tenQReports, setTenQReports] = useState([]);
+    const [tenKReports, setTenKReports] = useState<Report[]>([]);
+    const [tenQReports, setTenQReports] = useState<Report[]>([]);
     const [loading, setLoading] = useState(true);
     const [defaultYear, setDefaultYear] = useState<string | null>(null);
 
@@ -49,8 +65,8 @@ export default function CompanyReports() {
                         accessionNumber: filings.accessionNumber[index],
                         primaryDocument: filings.primaryDocument[index],
                     }))
-                    .filter((report: any) => report.form === "10-Q")
-                    .map((report: any) => ({
+                    .filter((report: Report) => report.form === "10-Q")
+                    .map((report:Report) => ({
                         date: report.date,
                         url: `https://www.sec.gov/Archives/edgar/data/${cik}/${report.accessionNumber.replace(
                             /-/g,
@@ -58,15 +74,15 @@ export default function CompanyReports() {
                         )}/${report.primaryDocument}`,
                     }));
 
-                const tenKReports = filings.form
+                const tenKReports:Report[] = filings.form
                     .map((form: string, index: number) => ({
                         form,
                         date: filings.filingDate[index],
                         accessionNumber: filings.accessionNumber[index],
                         primaryDocument: filings.primaryDocument[index],
                     }))
-                    .filter((report: any) => report.form === "10-K")
-                    .map((report: any) => ({
+                    .filter((report: Report) => report.form === "10-K")
+                    .map((report: Report) => ({
                         date: report.date,
                         url: `https://www.sec.gov/Archives/edgar/data/${cik}/${report.accessionNumber.replace(
                             /-/g,
