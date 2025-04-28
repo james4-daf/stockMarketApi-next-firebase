@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from 'next/navigation';
 import { useStock } from "@/app/hooks/useStock";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
-import {FileText} from "lucide-react";
+import { FileText } from "lucide-react";
 
 
 type Report = {
@@ -28,7 +28,8 @@ export default function CompanyReports() {
     const [tenQReports, setTenQReports] = useState<Report[]>([]);
     const [loading, setLoading] = useState(true);
     const [defaultYear, setDefaultYear] = useState<string | null>(null);
-
+const [summaries, setSummaries] = useState<{ [url: string]: string }>({});
+    const [loadingSummary, setLoadingSummary] = useState<{ [url: string]: boolean }>({});
 
     useEffect(() => {
         if (!stockTicker) return;
@@ -43,13 +44,11 @@ export default function CompanyReports() {
                 );
                 const profileData = await profileRes.json();
 
-                // if (!profileData.length) throw new Error("Company not found.");
                 if (!profileData.length) {
                     console.error("Company not found.");
                     return; // Avoid throwing an error
                 }
                 const cik = profileData[0].cik;
-                console.log(cik);
 
                 // Step 2: Get 10-Q and 10-K reports from SEC
                 const secRes = await fetch(`https://data.sec.gov/submissions/CIK${cik}.json`);
@@ -66,7 +65,7 @@ export default function CompanyReports() {
                         primaryDocument: filings.primaryDocument[index],
                     }))
                     .filter((report: Report) => report.form === "10-Q")
-                    .map((report:Report) => ({
+                    .map((report: Report) => ({
                         date: report.date,
                         url: `https://www.sec.gov/Archives/edgar/data/${cik}/${report.accessionNumber.replace(
                             /-/g,
@@ -74,7 +73,7 @@ export default function CompanyReports() {
                         )}/${report.primaryDocument}`,
                     }));
 
-                const tenKReports:Report[] = filings.form
+                const tenKReports: Report[] = filings.form
                     .map((form: string, index: number) => ({
                         form,
                         date: filings.filingDate[index],
@@ -102,7 +101,31 @@ export default function CompanyReports() {
         fetchReports();
     }, [stockTicker, apiKey]);
 
-    // Helper function to group reports by year
+    const handleGetSummary = async (reportUrl: string) => {
+    setLoadingSummary(prev => ({ ...prev, [reportUrl]: true }));
+    setSummaries(prev => ({ ...prev, [reportUrl]: "" }));
+        try {
+            const res = await fetch("/api/aireportsummary", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ url: reportUrl }),
+            });
+
+            const data = await res.json();
+            if (res.status === 429) {
+                setSummaries(prev => ({ ...prev, [reportUrl]: "⚠️ Rate limit hit. Please wait before trying again." }));
+            } else {
+                setSummaries(prev => ({ ...prev, [reportUrl]: data.summary }));
+            }
+        } catch (err) {
+            setSummaries(prev => ({ ...prev, [reportUrl]: "❌ Something went wrong." }));
+        } finally {
+            setLoadingSummary(prev => ({ ...prev, [reportUrl]: false }));
+        }
+    };
+
     const groupByYear = (reports: any[]) => {
         return reports.reduce((acc, report) => {
             const year = new Date(report.date).getFullYear();
@@ -114,11 +137,9 @@ export default function CompanyReports() {
         }, {});
     };
 
-    // Group reports by year
     const groupedTenQReports = groupByYear(tenQReports);
     const groupedTenKReports = groupByYear(tenKReports);
 
-    // Combine both reports in each year
     const groupedReports = Object.keys(groupedTenQReports).reduce((acc, year) => {
         acc[year] = {
             tenQ: groupedTenQReports[year],
@@ -127,8 +148,6 @@ export default function CompanyReports() {
         return acc;
     }, {});
 
-
-    // Set the most recent year as the default value
     useEffect(() => {
         if (Object.keys(groupedReports).length > 0) {
             setLoading(true);
@@ -143,9 +162,6 @@ export default function CompanyReports() {
         <div className="p-4">
             <h1 className="text-xl font-bold mb-4">{stockTicker} Reports</h1>
 
-
-
-
             <Tabs defaultValue={defaultYear} className="w-[400px]">
                 <TabsList>
                     {Object.keys(groupedReports).sort((a, b) => b.localeCompare(a)).map((year) => (
@@ -157,28 +173,34 @@ export default function CompanyReports() {
 
                 {Object.keys(groupedReports).map((year) => (
                     <TabsContent key={year} value={year}>
-
                         <div>
-                            {/* 10-Q Reports for this year */}
                             {groupedReports[year].tenQ.length > 0 && (
                                 <div>
                                     <h4 className="font-medium">Quartely Reports</h4>
                                     <ul>
                                         {groupedReports[year].tenQ.map((report, index) => (
-                                            <li key={index}>
-                                                <a href={report.url} target="_blank" rel="noopener noreferrer" className="flex">
-
-
+                                            <li key={index} className="mb-2">
+                                                <a href={report.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-blue-600 hover:underline">
                                                     <FileText color='#1bafee'/>
-                                                        <span>{report.date} - 10-Q </span>
-
+                                                    <span>{report.date} - 10-Q</span>
                                                 </a>
+                                                <button
+                                                    onClick={() => handleGetSummary(report.url)}
+                                                    className="text-sm text-blue-500 underline ml-6"
+                                                >
+                                                    Get Summary
+                                                </button>
+                                                {loadingSummary[report.url] && <p className="text-sm text-gray-500">Loading summary...</p>}
+                                                {summaries[report.url] && (
+                                                    <p className="mt-1 text-sm text-gray-700">
+                                                        {summaries[report.url]}
+                                                    </p>
+                                                )}
                                             </li>
                                         ))}
                                     </ul>
                                 </div>
                             )}
-                            {/* 10-K Reports for this year */}
                             {groupedReports[year].tenK.length > 0 && (
                                 <div>
                                     <h4 className="font-medium">Annual Report</h4>
@@ -197,7 +219,6 @@ export default function CompanyReports() {
                     </TabsContent>
                 ))}
             </Tabs>
-
         </div>
     );
 }

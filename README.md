@@ -2,6 +2,8 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
+https://site.financialmodelingprep.com/developer/docs/dashboard
+
 First, run the development server:
 
 ```bash
