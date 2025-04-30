@@ -25,6 +25,7 @@ import { useStock } from '@/app/hooks/useStock';
 import { useParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import BalanceSheetTable from './BalanceSheetTable';
+import CashFlowTable from './CashFlowTable';
 
 const chartConfig = {
   revenue: {
@@ -181,7 +182,7 @@ export function RevenueChart() {
         <BalanceSheetTable />
       </TabsContent>
       <TabsContent value="Cash Flow">
-        <p>Cash Flow</p>
+        <CashFlowTable />
       </TabsContent>
     </Tabs>
   );

@@ -1,36 +1,43 @@
 import { useStock } from '@/app/hooks/useStock';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { useIsFreeStock } from '@/hooks/isFreeStock';
 import { Loader2 } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
-interface BalanceSheetDataTypes {
+interface CashFlowDataTypes {
   date: string;
   fiscalYear: string;
-  cashAndCashEquivalents: number;
-  totalEquity: number;
-  totalDebt: number;
-  netDebt: number;
+  netIncome: number;
+  stockBasedCompensation: number;
+  freeCashFlow: number;
+  period?: string;
 }
 
 //endpoint
 //https://financialmodelingprep.com/stable/balance-sheet-statement?symbol=AAPL&apikey=
 
-const BalanceSheetTable = () => {
+const CashFlowTable = () => {
   const { apiKey } = useStock();
-
   const params = useParams<{ stockTicker: string }>();
+  const isFree = useIsFreeStock();
   const { stockTicker } = params;
-  const [balanceSheetData, setBalanceSheetData] =
-    useState<BalanceSheetDataTypes[]>();
+  const [cashFlowData, setCashFlowData] = useState<CashFlowDataTypes[]>();
+  const [period, setPeriod] = useState<'annual' | 'quarter'>('annual');
   const fetched = useRef(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -39,13 +46,14 @@ const BalanceSheetTable = () => {
     if (!stockTicker || fetched.current) return;
     fetched.current = true;
 
+    //financialmodelingprep.com/stable/cash-flow-statement?symbol=${stockTicker}&period=quarter&apikey=${apiKey}
+
     const fetchBalanceSheetStockData = async () => {
       try {
         setLoading(true);
         setError(null);
-
         const response = await fetch(
-          `https://financialmodelingprep.com/api/v3/balance-sheet-statement/${stockTicker}?period=annual&apikey=${apiKey}`,
+          `https://financialmodelingprep.com/api/v3/cash-flow-statement/${stockTicker}?period=${period}&apikey=${apiKey}`,
         );
         if (!response.ok) {
           throw new Error(`Error ${response.status}: ${response.statusText}`);
@@ -57,22 +65,22 @@ const BalanceSheetTable = () => {
             ({
               date,
               fiscalYear,
-              cashAndCashEquivalents,
-              totalEquity,
-              totalDebt,
-              netDebt,
-            }: BalanceSheetDataTypes) => ({
+              netIncome,
+              stockBasedCompensation,
+              freeCashFlow,
+              period,
+            }: CashFlowDataTypes) => ({
               date: new Date(date).getFullYear(), // Extract only the years
               fiscalYear,
-              cashAndCashEquivalents: cashAndCashEquivalents / 1e9,
-              totalEquity: totalEquity / 1e9,
-              totalDebt: totalDebt / 1e9,
-              netDebt: netDebt / 1e9,
+              netIncome: netIncome / 1e9,
+              stockBasedCompensation: stockBasedCompensation / 1e9,
+              freeCashFlow: freeCashFlow / 1e9,
+              period,
             }),
           )
           .sort((a, b) => a.date - b.date);
 
-        setBalanceSheetData(extractedData);
+        setCashFlowData(extractedData);
         console.log('revData', extractedData);
       } catch (error) {
         setError(error instanceof Error ? error.message : 'An error occurred.');
@@ -83,7 +91,7 @@ const BalanceSheetTable = () => {
     };
 
     fetchBalanceSheetStockData();
-  }, [stockTicker, apiKey]);
+  }, [stockTicker, apiKey, period]);
   return (
     <div>
       {error && <p className="text-red-500">Error: {error}</p>}
@@ -93,15 +101,31 @@ const BalanceSheetTable = () => {
           <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
         </div>
       )}
+
+      {!loading && isFree && (
+        <Select
+          onValueChange={(value) => setPeriod(value as 'annual' | 'quarter')}
+        >
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Period" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="annual">Annual</SelectItem>
+            <SelectItem value="quarter">Quartely</SelectItem>
+          </SelectContent>
+        </Select>
+      )}
+
       <Table>
-        <TableCaption>Balance Sheet Overview</TableCaption>
         <TableHeader>
           <TableRow>
             <TableHead className="font-bold">Metric</TableHead>
-            {balanceSheetData &&
-              balanceSheetData.map((item: BalanceSheetDataTypes) => (
+            {cashFlowData &&
+              cashFlowData.map((item: CashFlowDataTypes) => (
                 <TableHead key={item.date} className="text-center font-bold">
-                  {item.date}
+                  {period === 'quarter'
+                    ? `${item.fiscalYear} ${item.period}`
+                    : item.date}
                 </TableHead>
               ))}
           </TableRow>
@@ -109,26 +133,22 @@ const BalanceSheetTable = () => {
         <TableBody>
           {[
             {
-              label: 'Cash And Cash Equivalents',
-              key: 'cashAndCashEquivalents' as keyof BalanceSheetDataTypes,
+              label: 'Net Income',
+              key: 'netIncome' as keyof CashFlowDataTypes,
             },
             {
-              label: 'Total Equity',
-              key: 'totalEquity' as keyof BalanceSheetDataTypes,
+              label: 'Stock Based Compensation',
+              key: 'stockBasedCompensation' as keyof CashFlowDataTypes,
             },
             {
-              label: 'Total Debt',
-              key: 'totalDebt' as keyof BalanceSheetDataTypes,
-            },
-            {
-              label: 'Net Debt',
-              key: 'netDebt' as keyof BalanceSheetDataTypes,
+              label: 'Free Cash Flow',
+              key: 'freeCashFlow' as keyof CashFlowDataTypes,
             },
           ].map(({ label, key }) => (
             <TableRow key={key}>
               <TableCell className="font-bold">{label}</TableCell>
-              {balanceSheetData &&
-                balanceSheetData.map((item: BalanceSheetDataTypes) => (
+              {cashFlowData &&
+                cashFlowData.map((item: CashFlowDataTypes) => (
                   <TableCell
                     key={`${item.date}-${key}`}
                     className="text-center"
@@ -144,4 +164,4 @@ const BalanceSheetTable = () => {
   );
 };
 
-export default BalanceSheetTable;
+export default CashFlowTable;

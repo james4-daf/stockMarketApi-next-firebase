@@ -2,7 +2,6 @@
 import KeyFeatures from '@/app/components/KeyFeatures';
 import CompanyReports from '@/app/components/Sections/CompanyReports';
 import Financials from '@/app/components/Sections/Financials';
-import Watchlist from '@/app/components/Sections/Watchlist';
 import { db } from '@/app/firebase/firebase';
 import { useAuth } from '@/app/hooks/useAuth';
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
