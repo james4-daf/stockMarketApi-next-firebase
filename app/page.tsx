@@ -2,6 +2,7 @@
 import { SearchBar } from '@/app/components/SearchBar';
 import Watchlist from '@/app/components/Sections/Watchlist';
 import Login from './components/Login';
+import CompanyEarnings from './components/Sections/CompanyEarnings';
 import { useAuth } from './hooks/useAuth';
 
 export default function Home() {

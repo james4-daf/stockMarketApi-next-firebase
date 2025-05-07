@@ -8,6 +8,7 @@ import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import Image from 'next/image';
 import { notFound, useParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import CompanyEarnings from '../components/Sections/CompanyEarnings';
 import { useStock } from '../hooks/useStock';
 
 export default function StockPage() {
@@ -159,9 +160,9 @@ export default function StockPage() {
           </div>
         )}
       </div>
-
       <Financials />
       <CompanyReports />
+      <CompanyEarnings />
     </div>
   );
 }
