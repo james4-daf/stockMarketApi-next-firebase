@@ -170,10 +170,13 @@ export default function CompanyReports() {
   if (loading) return <p>Loading...</p>;
   if (!defaultYear) return null;
   return (
-    <div className="p-4">
+    <div className="p-4 ">
       <h1 className="text-xl font-bold mb-4">{stockTicker} Reports</h1>
 
-      <Tabs defaultValue={defaultYear} className="w-[400px]">
+      <Tabs
+        defaultValue={defaultYear}
+        className="w-full sm:overflow-x-auto sm:max-w-full overflow-x-scroll max-w-[330px] "
+      >
         <TabsList>
           {Object.keys(groupedReports)
             .sort((a, b) => b.localeCompare(a))

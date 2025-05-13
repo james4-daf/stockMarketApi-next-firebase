@@ -2,6 +2,7 @@ import { useAuth } from '@/app/hooks/useAuth';
 import { useStock } from '@/app/hooks/useStock';
 import { notFound, useParams } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
+import { Separator } from '../ui/separator';
 
 interface Earnings {
   symbol: string;
@@ -81,36 +82,52 @@ const CompanyEarnings = () => {
   }, []);
 
   return (
-    <div className="earnings-list">
-      <h2>Recent Earnings</h2>
-      <ul>
-        {earnings.map((item) => (
-          <li key={item.date}>
-            <div>
-              <strong>Date:</strong> {item.date}
-            </div>
-            <div>
-              <strong>EPS Actual:</strong> {item.epsActual}
-            </div>
-            <div>
-              <strong>EPS Estimated:</strong> {item.epsEstimated}
-            </div>
-            <div>
-              <strong>Revenue Actual:</strong>{' '}
-              {item.revenueActual
-                ? `$${item.revenueActual.toLocaleString()}`
-                : 'N/A'}
-            </div>
-            <div>
-              <strong>Revenue Estimated:</strong>{' '}
-              {item.revenueEstimated
-                ? `$${item.revenueEstimated.toLocaleString()}`
-                : 'N/A'}
-            </div>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <>
+      {earnings.length > 0 && (
+        <div className="earnings-list">
+          <Separator />
+          <h2>Recent Earnings</h2>
+          <ul>
+            {earnings.map((item) => {
+              const isNew =
+                new Date(item.date) >
+                new Date(new Date().setMonth(new Date().getMonth() - 1));
+
+              return (
+                <li key={item.date} className="mb-4">
+                  <div className="flex items-center gap-2">
+                    <strong>Date:</strong> {item.date}
+                    {isNew && (
+                      <span className="bg-green-500 text-white text-xs font-semibold px-2 py-1 rounded">
+                        NEW
+                      </span>
+                    )}
+                  </div>
+                  <div>
+                    <strong>EPS Actual:</strong> {item.epsActual}
+                  </div>
+                  <div>
+                    <strong>EPS Estimated:</strong> {item.epsEstimated}
+                  </div>
+                  <div>
+                    <strong>Revenue Actual:</strong>{' '}
+                    {item.revenueActual
+                      ? `$${item.revenueActual.toLocaleString()}`
+                      : 'N/A'}
+                  </div>
+                  <div>
+                    <strong>Revenue Estimated:</strong>{' '}
+                    {item.revenueEstimated
+                      ? `$${item.revenueEstimated.toLocaleString()}`
+                      : 'N/A'}
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
+    </>
   );
 };
 export default CompanyEarnings;

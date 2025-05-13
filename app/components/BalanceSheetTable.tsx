@@ -85,7 +85,7 @@ const BalanceSheetTable = () => {
     fetchBalanceSheetStockData();
   }, [stockTicker, apiKey]);
   return (
-    <div>
+    <div className="w-full sm:overflow-x-auto sm:max-w-full overflow-x-scroll max-w-[330px]">
       {error && <p className="text-red-500">Error: {error}</p>}
 
       {loading && (
@@ -93,53 +93,55 @@ const BalanceSheetTable = () => {
           <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
         </div>
       )}
-      <Table>
-        <TableCaption>Balance Sheet Overview</TableCaption>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="font-bold">Metric</TableHead>
-            {balanceSheetData &&
-              balanceSheetData.map((item: BalanceSheetDataTypes) => (
-                <TableHead key={item.date} className="text-center font-bold">
-                  {item.date}
-                </TableHead>
-              ))}
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {[
-            {
-              label: 'Cash And Cash Equivalents',
-              key: 'cashAndCashEquivalents' as keyof BalanceSheetDataTypes,
-            },
-            {
-              label: 'Total Equity',
-              key: 'totalEquity' as keyof BalanceSheetDataTypes,
-            },
-            {
-              label: 'Total Debt',
-              key: 'totalDebt' as keyof BalanceSheetDataTypes,
-            },
-            {
-              label: 'Net Debt',
-              key: 'netDebt' as keyof BalanceSheetDataTypes,
-            },
-          ].map(({ label, key }) => (
-            <TableRow key={key}>
-              <TableCell className="font-bold">{label}</TableCell>
+      {!loading && balanceSheetData && (
+        <Table className="min-w-[400px]">
+          <TableCaption>Balance Sheet Overview</TableCaption>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="font-bold">Metric</TableHead>
               {balanceSheetData &&
                 balanceSheetData.map((item: BalanceSheetDataTypes) => (
-                  <TableCell
-                    key={`${item.date}-${key}`}
-                    className="text-center"
-                  >
-                    {item[key]}
-                  </TableCell>
+                  <TableHead key={item.date} className="text-center font-bold">
+                    {item.date}
+                  </TableHead>
                 ))}
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody className="content-start">
+            {[
+              {
+                label: 'Cash And Cash Equivalents',
+                key: 'cashAndCashEquivalents' as keyof BalanceSheetDataTypes,
+              },
+              {
+                label: 'Total Equity',
+                key: 'totalEquity' as keyof BalanceSheetDataTypes,
+              },
+              {
+                label: 'Total Debt',
+                key: 'totalDebt' as keyof BalanceSheetDataTypes,
+              },
+              {
+                label: 'Net Debt',
+                key: 'netDebt' as keyof BalanceSheetDataTypes,
+              },
+            ].map(({ label, key }) => (
+              <TableRow key={key}>
+                <TableCell className="font-bold">{label}</TableCell>
+                {balanceSheetData &&
+                  balanceSheetData.map((item: BalanceSheetDataTypes) => (
+                    <TableCell
+                      key={`${item.date}-${key}`}
+                      className="text-center"
+                    >
+                      {item[key]}
+                    </TableCell>
+                  ))}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
     </div>
   );
 };

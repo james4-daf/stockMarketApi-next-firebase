@@ -93,7 +93,7 @@ const CashFlowTable = () => {
     fetchBalanceSheetStockData();
   }, [stockTicker, apiKey, period]);
   return (
-    <div>
+    <div className="w-full sm:overflow-x-auto sm:max-w-full overflow-x-scroll max-w-[330px]">
       {error && <p className="text-red-500">Error: {error}</p>}
 
       {loading && (
@@ -115,51 +115,52 @@ const CashFlowTable = () => {
           </SelectContent>
         </Select>
       )}
-
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="font-bold">Metric</TableHead>
-            {cashFlowData &&
-              cashFlowData.map((item: CashFlowDataTypes) => (
-                <TableHead key={item.date} className="text-center font-bold">
-                  {period === 'quarter'
-                    ? `${item.fiscalYear} ${item.period}`
-                    : item.date}
-                </TableHead>
-              ))}
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {[
-            {
-              label: 'Net Income',
-              key: 'netIncome' as keyof CashFlowDataTypes,
-            },
-            {
-              label: 'Stock Based Compensation',
-              key: 'stockBasedCompensation' as keyof CashFlowDataTypes,
-            },
-            {
-              label: 'Free Cash Flow',
-              key: 'freeCashFlow' as keyof CashFlowDataTypes,
-            },
-          ].map(({ label, key }) => (
-            <TableRow key={key}>
-              <TableCell className="font-bold">{label}</TableCell>
+      {!loading && cashFlowData && (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="font-bold">Metric</TableHead>
               {cashFlowData &&
                 cashFlowData.map((item: CashFlowDataTypes) => (
-                  <TableCell
-                    key={`${item.date}-${key}`}
-                    className="text-center"
-                  >
-                    {item[key]}
-                  </TableCell>
+                  <TableHead key={item.date} className="text-center font-bold">
+                    {period === 'quarter'
+                      ? `${item.fiscalYear} ${item.period}`
+                      : item.date}
+                  </TableHead>
                 ))}
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {[
+              {
+                label: 'Net Income',
+                key: 'netIncome' as keyof CashFlowDataTypes,
+              },
+              {
+                label: 'Stock Based Compensation',
+                key: 'stockBasedCompensation' as keyof CashFlowDataTypes,
+              },
+              {
+                label: 'Free Cash Flow',
+                key: 'freeCashFlow' as keyof CashFlowDataTypes,
+              },
+            ].map(({ label, key }) => (
+              <TableRow key={key}>
+                <TableCell className="font-bold">{label}</TableCell>
+                {cashFlowData &&
+                  cashFlowData.map((item: CashFlowDataTypes) => (
+                    <TableCell
+                      key={`${item.date}-${key}`}
+                      className="text-center"
+                    >
+                      {item[key]}
+                    </TableCell>
+                  ))}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
     </div>
   );
 };

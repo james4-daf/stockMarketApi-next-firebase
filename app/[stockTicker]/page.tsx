@@ -9,6 +9,7 @@ import Image from 'next/image';
 import { notFound, useParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import CompanyEarnings from '../components/Sections/CompanyEarnings';
+import { Separator } from '../components/ui/separator';
 import { useStock } from '../hooks/useStock';
 
 export default function StockPage() {
@@ -129,7 +130,7 @@ export default function StockPage() {
                     <h2>{stockData?.companyName}</h2>
 
                     <p>Stock Price: ${stockData?.price}</p>
-                    <p>Market Cap: ${stockData?.mktCap / 1e9}B</p>
+                    <p>Market Cap: ${(stockData?.mktCap / 1e9).toFixed(2)}B</p>
                   </>
                 )}
 
@@ -160,6 +161,7 @@ export default function StockPage() {
           </div>
         )}
       </div>
+      <Separator className="mt-6" />
       <Financials />
       <CompanyReports />
       <CompanyEarnings />
