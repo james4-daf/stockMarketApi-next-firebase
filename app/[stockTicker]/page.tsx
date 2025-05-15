@@ -66,12 +66,19 @@ export default function StockPage() {
 
     const checkWatchlist = async () => {
       try {
+        const normalizedTicker = stockTicker.toUpperCase();
         const watchlistRef = doc(db, 'watchlist', user.uid);
         const watchlistSnap = await getDoc(watchlistRef);
 
         if (watchlistSnap.exists()) {
           const stocks = watchlistSnap.data().stocks || [];
-          setInWatchlist(stocks.includes(stockTicker));
+
+          // Check for the normalized ticker (case-insensitive)
+          const inList = stocks.some(
+            (stock: string) => stock.toUpperCase() === normalizedTicker,
+          );
+
+          setInWatchlist(inList);
         }
       } catch (error) {
         console.error('Error checking watchlist:', error);
@@ -84,20 +91,32 @@ export default function StockPage() {
   const toggleWatchlist = async () => {
     if (!user?.uid || !stockTicker) return;
 
+    const normalizedTicker = stockTicker.toUpperCase();
     const watchlistRef = doc(db, 'watchlist', user.uid);
 
     try {
       const watchlistSnap = await getDoc(watchlistRef);
       if (watchlistSnap.exists()) {
         const stocks = watchlistSnap.data().stocks || [];
-        const updatedStocks = inWatchlist
-          ? stocks.filter((stock: string) => stock !== stockTicker) // Remove stock
-          : [...stocks, stockTicker]; // Add stock
+        const tickerExists = stocks.some(
+          (stock: string) => stock.toUpperCase() === normalizedTicker,
+        );
+        const updatedStocks = tickerExists
+          ? stocks.filter(
+              (stock: string) => stock.toUpperCase() !== normalizedTicker,
+            ) // Remove stock
+          : [
+              ...stocks.filter(
+                (stock: string, index: number) =>
+                  stocks.indexOf(stock) === index,
+              ),
+              normalizedTicker,
+            ]; // Add stock
 
         await updateDoc(watchlistRef, { stocks: updatedStocks });
         setInWatchlist(!inWatchlist);
       } else {
-        await setDoc(watchlistRef, { stocks: [stockTicker] }); // Create document if missing
+        await setDoc(watchlistRef, { stocks: [normalizedTicker] }); // Create document if missing
         setInWatchlist(true);
       }
     } catch (error) {
