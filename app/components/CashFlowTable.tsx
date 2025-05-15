@@ -78,7 +78,10 @@ const CashFlowTable = () => {
               period,
             }),
           )
-          .sort((a, b) => a.date - b.date);
+          .sort(
+            (a: CashFlowDataTypes, b: CashFlowDataTypes) =>
+              Number(a.date) - Number(b.date),
+          );
 
         setCashFlowData(extractedData);
         console.log('revData', extractedData);

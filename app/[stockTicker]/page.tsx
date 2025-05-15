@@ -91,7 +91,7 @@ export default function StockPage() {
       if (watchlistSnap.exists()) {
         const stocks = watchlistSnap.data().stocks || [];
         const updatedStocks = inWatchlist
-          ? stocks.filter((stock) => stock !== stockTicker) // Remove stock
+          ? stocks.filter((stock: string) => stock !== stockTicker) // Remove stock
           : [...stocks, stockTicker]; // Add stock
 
         await updateDoc(watchlistRef, { stocks: updatedStocks });

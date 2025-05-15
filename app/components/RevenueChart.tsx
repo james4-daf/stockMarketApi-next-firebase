@@ -79,7 +79,10 @@ export function RevenueChart() {
             revenue: revenue / 1e9, // Convert to billions
             epsdiluted,
           }))
-          .sort((a, b) => a.date - b.date);
+          .sort(
+            (a: fundamentalDataTypes, b: fundamentalDataTypes) =>
+              Number(a.date) - Number(b.date),
+          );
 
         setRevenueData(extractedData);
         // console.log("revData",extractedData);

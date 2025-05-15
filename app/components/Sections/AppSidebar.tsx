@@ -5,7 +5,6 @@ import { signOutFromGoogle } from '@/app/firebase/firebase';
 import { useAuth } from '@/app/hooks/useAuth';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import Login from '../Login';
 import {
   Sidebar,
   SidebarContent,

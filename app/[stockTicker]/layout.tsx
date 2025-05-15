@@ -1,6 +1,4 @@
 'use client';
-
-import Login from '@/app/components/Login';
 import Header from '@/app/components/Sections/Header';
 import { useAuth } from '@/app/hooks/useAuth';
 import LoginFull from '../components/LoginFull';

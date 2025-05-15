@@ -70,7 +70,10 @@ const BalanceSheetTable = () => {
               netDebt: netDebt / 1e9,
             }),
           )
-          .sort((a, b) => a.date - b.date);
+          .sort(
+            (a: BalanceSheetDataTypes, b: BalanceSheetDataTypes) =>
+              Number(a.date) - Number(b.date),
+          );
 
         setBalanceSheetData(extractedData);
         console.log('revData', extractedData);

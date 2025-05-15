@@ -1,4 +1,3 @@
-import { useAuth } from '@/app/hooks/useAuth';
 import { useStock } from '@/app/hooks/useStock';
 import { notFound, useParams } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
@@ -15,7 +14,6 @@ interface Earnings {
 }
 
 const CompanyEarnings = () => {
-  const { user } = useAuth();
   const { apiKey } = useStock();
   const [earnings, setEarnings] = useState<Earnings[]>([]);
 
@@ -43,7 +41,6 @@ const CompanyEarnings = () => {
           notFound(); // ❌ Triggers Next.js 404 page
           return;
         }
-        const { symbol, mktCap, price, image, companyName } = json;
         console.log(json);
         // setStockData({ symbol, mktCap, price, image, companyName });
       } catch (error) {
@@ -83,6 +80,8 @@ const CompanyEarnings = () => {
 
   return (
     <>
+      {loading && <p>Loading...</p>}
+      {error && <p className="text-red-500">Error: {error}</p>}
       {earnings.length > 0 && (
         <div className="earnings-list">
           <Separator />
