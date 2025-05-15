@@ -40,7 +40,7 @@ export function SearchBar() {
     return () => clearTimeout(debounceTimer);
   }, [searchText, apiKey]);
 
-  const stockSearch = (e) => {
+  const stockSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!searchText.trim()) {
       setError('Ticker cannot be empty.');

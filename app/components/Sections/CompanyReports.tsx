@@ -146,16 +146,21 @@ export default function CompanyReports() {
     }, {});
   };
 
-  const groupedTenQReports = groupByYear(tenQReports);
-  const groupedTenKReports = groupByYear(tenKReports);
+  const groupedTenQReports: { [year: string]: Report[] } =
+    groupByYear(tenQReports);
+  const groupedTenKReports: { [year: string]: Report[] } =
+    groupByYear(tenKReports);
 
-  const groupedReports = Object.keys(groupedTenQReports).reduce((acc, year) => {
-    acc[year] = {
-      tenQ: groupedTenQReports[year],
-      tenK: groupedTenKReports[year] || [],
-    };
-    return acc;
-  }, {});
+  const groupedReports = Object.keys(groupedTenQReports).reduce(
+    (acc: { [year: string]: { tenQ: Report[]; tenK: Report[] } }, year) => {
+      acc[year] = {
+        tenQ: groupedTenQReports[year],
+        tenK: groupedTenKReports[year] || [],
+      };
+      return acc;
+    },
+    {},
+  );
 
   useEffect(() => {
     if (Object.keys(groupedReports).length > 0) {
