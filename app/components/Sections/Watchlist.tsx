@@ -13,6 +13,7 @@ import { useStock } from '@/app/hooks/useStock';
 import { ChevronDown, ChevronUp } from 'lucide-react'; // Add at top with other imports
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
+import Header from './Header';
 
 type UserType = {
   uid: string;
@@ -126,6 +127,7 @@ export default function Watchlist() {
 
   return (
     <div className="p-4">
+      <Header />
       <h2 className="text-xl font-bold">Watchlist</h2>
 
       <Table>

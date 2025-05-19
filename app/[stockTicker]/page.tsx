@@ -1,14 +1,13 @@
 'use client';
-import KeyFeatures from '@/app/components/KeyFeatures';
 import CompanyReports from '@/app/components/Sections/CompanyReports';
 import Financials from '@/app/components/Sections/Financials';
 import { db } from '@/app/firebase/firebase';
 import { useAuth } from '@/app/hooks/useAuth';
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
-import Image from 'next/image';
 import { notFound, useParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import CompanyEarnings from '../components/Sections/CompanyEarnings';
+import { StockDetails } from '../components/Sections/StockDetails';
 import { Separator } from '../components/ui/separator';
 import { useStock } from '../hooks/useStock';
 
@@ -124,58 +123,22 @@ export default function StockPage() {
     }
   };
   return (
-    <div className="p-8 ">
-      <div className="text-center">
+    <div className="flex-1 p-8 overflow-y-auto">
+      <div className="max-w-5xl mx-auto">
+        {stockData && (
+          <StockDetails
+            stockData={stockData}
+            inWatchlist={inWatchlist}
+            toggleWatchlist={toggleWatchlist}
+          />
+        )}
         {loading && <p>Loading stock data...</p>}
 
         {error && <p className="text-red-500">Error: {error}</p>}
         {!loading && (
           <div className="flex">
             <div className="flex justify-center items-center w-full">
-              <div className="columns-2">
-                <>
-                  <Image
-                    priority
-                    src={`${stockData?.image}`}
-                    width={150}
-                    height={150}
-                    alt={`Picture of ${stockTicker} logo`}
-                  />
-                  <p>Ticker: {stockData?.symbol}</p>
-                </>
-
-                {stockData && (
-                  <>
-                    <h2>{stockData?.companyName}</h2>
-
-                    <p>Stock Price: ${stockData?.price}</p>
-                    <p>Market Cap: ${(stockData?.mktCap / 1e9).toFixed(2)}B</p>
-                  </>
-                )}
-
-                <button className="flex pe-1" onClick={toggleWatchlist}>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill={inWatchlist ? 'currentColor' : 'none'}
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="size-6"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z"
-                    />
-                  </svg>
-
-                  {inWatchlist ? 'In Watchlist' : 'Add to Watchlist'}
-                </button>
-              </div>
-            </div>
-
-            <div className="justify-center items-center w-full">
-              <KeyFeatures />
+              <div className="columns-2"></div>
             </div>
           </div>
         )}

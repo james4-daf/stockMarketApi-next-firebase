@@ -84,9 +84,9 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: 'rlig' 1, 'calt' 1;
   }
 }
-
 
 @layer base {
   :root {
@@ -129,4 +129,3 @@ body {
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
-

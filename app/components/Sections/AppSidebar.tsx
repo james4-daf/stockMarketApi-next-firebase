@@ -1,5 +1,5 @@
 'use client';
-import { Eye, Search, UserCog } from 'lucide-react';
+import { Eye, LogOut, Search, UserCog } from 'lucide-react';
 
 import { signOutFromGoogle } from '@/app/firebase/firebase';
 import { useAuth } from '@/app/hooks/useAuth';
@@ -92,14 +92,13 @@ export function AppSidebar() {
       </SidebarContent>
       <SidebarFooter>
         {user && (
-          <div className="mb-6  ">
-            <button
-              onClick={handleLogout}
-              className="px-4 py-2 bg-red-500 text-white rounded-md"
-            >
-              Logout
-            </button>
-          </div>
+          <button
+            className="flex items-center w-full px-4 py-2 text-white bg-red-500 hover:bg-red-600 rounded-lg transition-colors"
+            onClick={handleLogout}
+          >
+            <LogOut className="w-4 h-4 mr-2" />
+            <span>Logout</span>
+          </button>
         )}
       </SidebarFooter>
     </Sidebar>

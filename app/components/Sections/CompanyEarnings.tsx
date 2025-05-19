@@ -1,3 +1,4 @@
+import { useFetchWithApiLimit } from '@/app/hooks/useFetchWithApiLimit';
 import { useStock } from '@/app/hooks/useStock';
 import { notFound, useParams } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
@@ -15,7 +16,9 @@ interface Earnings {
 
 const CompanyEarnings = () => {
   const { apiKey } = useStock();
+  const { fetchWithApiLimit, apiError, clearError } = useFetchWithApiLimit();
   const [earnings, setEarnings] = useState<Earnings[]>([]);
+  const [earningsMiss, setEarningsMiss] = useState<boolean | null>(null);
 
   const params = useParams<{ stockTicker: string }>();
   const { stockTicker } = params;
@@ -56,10 +59,23 @@ const CompanyEarnings = () => {
   useEffect(() => {
     const fetchEarnings = async () => {
       try {
-        const response = await fetch(
+        const response = await fetchWithApiLimit(
           `https://financialmodelingprep.com/stable/earnings?symbol=${stockTicker}&limit=5&apikey=${apiKey}`,
         ); // Replace with your actual API endpoint
         const data: Earnings[] = await response.json();
+        // if epsActual is more than epsEstimated, use setEarningsMiss to true else false
+        if (
+          data.some(
+            (item) =>
+              item.epsActual !== null &&
+              item.epsEstimated !== null &&
+              item.epsActual > item.epsEstimated,
+          )
+        ) {
+          setEarningsMiss(false);
+        } else {
+          setEarningsMiss(true);
+        }
 
         // Filter out objects where epsActual is null
         const filteredEarnings = data.filter((item) => item.epsActual !== null);
@@ -80,6 +96,14 @@ const CompanyEarnings = () => {
 
   return (
     <>
+      {apiError && (
+        <div className="fixed top-0 left-0 right-0 bg-red-500 text-white p-4 z-50">
+          {apiError}
+          <button onClick={clearError} className="ml-4 underline">
+            Dismiss
+          </button>
+        </div>
+      )}
       {loading && <p>Loading...</p>}
       {error && <p className="text-red-500">Error: {error}</p>}
       {earnings.length > 0 && (
@@ -103,11 +127,17 @@ const CompanyEarnings = () => {
                     )}
                   </div>
                   <div>
-                    <strong>EPS Actual:</strong> {item.epsActual}
-                  </div>
-                  <div>
                     <strong>EPS Estimated:</strong> {item.epsEstimated}
                   </div>
+                  <div>
+                    <strong>EPS Actual:</strong> {item.epsActual}
+                    {earningsMiss && (
+                      <span className="bg-green-500 text-white text-xs font-semibold px-2 py-1 rounded">
+                        missed
+                      </span>
+                    )}
+                  </div>
+
                   <div>
                     <strong>Revenue Actual:</strong>{' '}
                     {item.revenueActual

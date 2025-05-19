@@ -2,8 +2,8 @@ import { SearchBar } from '@/app/components/SearchBar';
 
 export default function Header() {
   return (
-    <div className="grid grid-cols-12 gap-2 p-8">
-      <div className="col-span-6 col-start-4 flex justify-center ">
+    <div className="flex-1 p-8 overflow-y-auto">
+      <div className="max-w-5xl mx-auto">
         <SearchBar />
       </div>
     </div>

@@ -52,11 +52,14 @@ export function SearchBar() {
   };
 
   return (
-    <div className="relative">
-      <form onSubmit={stockSearch} className="flex">
-        <div className="relative w-[300px] ">
+    <div className="">
+      <form
+        onSubmit={stockSearch}
+        className="relative w-full max-w-2xl mx-auto"
+      >
+        <div className=" w-full">
           <input
-            className="p-6 border-2 border-indigo-600 rounded-md w-full pr-10"
+            className="w-full px-4 py-3 pl-4 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
             value={searchText}
             type="text"
             placeholder="Enter a stock ticker e.g. TSLA"
