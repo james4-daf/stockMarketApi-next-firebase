@@ -49,7 +49,10 @@ export const StockDetails = ({
             </button>
           </div>
           <p className="text-gray-600">
-            Market Cap: ${(stockData?.mktCap / 1e9).toFixed(2)}
+            Market Cap: $
+            {stockData?.mktCap >= 1e12
+              ? `${(stockData.mktCap / 1e12).toFixed(1)}T`
+              : `${(stockData.mktCap / 1e9).toFixed(2)}B`}
           </p>
         </div>
       </div>

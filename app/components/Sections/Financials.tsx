@@ -1,6 +1,5 @@
 import { RevenueChart } from '@/app/components/RevenueChart';
 import { DividendsGraph } from '@/app/components/Sections/DividendsGraph';
-import { Separator } from '../ui/separator';
 
 export default function Financials() {
   return (
@@ -8,7 +7,7 @@ export default function Financials() {
       <div className="p-6">
         <h2 className="text-center text-xl font-semibold mb-6"> Financials</h2>
         <RevenueChart />
-        <Separator className="my-8" />
+
         <DividendsGraph />
       </div>
     </section>

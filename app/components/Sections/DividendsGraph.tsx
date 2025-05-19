@@ -17,6 +17,7 @@ import { useParams } from 'next/navigation';
 import * as React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { Bar, BarChart, CartesianGrid, XAxis } from 'recharts';
+import { Separator } from '../ui/separator';
 
 const chartConfig = {
   dividends: {
@@ -146,6 +147,7 @@ export function DividendsGraph() {
   return (
     dividendsData.length > 0 && (
       <>
+        <Separator className="my-8" />
         {loading && <p>Loading...</p>}
         {error && <p className="text-red-500">Error: {error}</p>}
         <Card>

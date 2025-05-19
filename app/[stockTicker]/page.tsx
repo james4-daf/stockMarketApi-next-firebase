@@ -145,8 +145,8 @@ export default function StockPage() {
       </div>
       <Separator className="mt-6" />
       <Financials />
-      <CompanyReports />
       <CompanyEarnings />
+      <CompanyReports />
     </div>
   );
 }

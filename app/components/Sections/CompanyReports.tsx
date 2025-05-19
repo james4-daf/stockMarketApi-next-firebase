@@ -210,12 +210,12 @@ export default function CompanyReports() {
                           <FileText color="#1bafee" />
                           <span>{report.date} - 10-Q</span>
                         </a>
-                        <button
+                        {/* <button
                           onClick={() => handleGetSummary(report.url)}
                           className="text-sm text-blue-500 underline ml-6"
                         >
                           Get Summary
-                        </button>
+                        </button> */}
                         {loadingSummary[report.url] && (
                           <p className="text-sm text-gray-500">
                             Loading summary...
