@@ -22,10 +22,13 @@ export default function StockPage() {
   const [error, setError] = useState<string | null>(null);
   const [stockData, setStockData] = useState<{
     symbol: string;
-    mktCap: number;
+    marketCap: number;
     price: number;
     image: string;
     companyName: string;
+    range: string;
+    change: number;
+    changePercentage: number;
   } | null>(null);
 
   const fetched = useRef(false);
@@ -38,7 +41,7 @@ export default function StockPage() {
         setLoading(true);
         setError(null);
         const response = await fetch(
-          `https://financialmodelingprep.com/api/v3/profile/${stockTicker}?apikey=${apiKey}`,
+          `https://financialmodelingprep.com/stable/profile?symbol=${stockTicker}&apikey=${apiKey}`,
         );
         if (!response.ok) {
           throw new Error(`Error ${response.status}: ${response.statusText}`);
@@ -48,8 +51,26 @@ export default function StockPage() {
           notFound(); // ❌ Triggers Next.js 404 page
           return;
         }
-        const { symbol, mktCap, price, image, companyName } = json[0];
-        setStockData({ symbol, mktCap, price, image, companyName });
+        const {
+          symbol,
+          marketCap,
+          price,
+          image,
+          companyName,
+          range,
+          change,
+          changePercentage,
+        } = json[0];
+        setStockData({
+          symbol,
+          marketCap,
+          price,
+          image,
+          companyName,
+          range,
+          change,
+          changePercentage,
+        });
       } catch (error) {
         setError(error instanceof Error ? error.message : 'An error occurred.');
       } finally {

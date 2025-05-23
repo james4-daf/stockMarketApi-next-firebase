@@ -152,7 +152,7 @@ const CompanyEarnings = () => {
               return (
                 <li
                   key={item.date}
-                  className="mb-4 border-b border-gray-200 pb-6"
+                  className="mb-4 border-b border-gray-200 last:border-none pb-6 last:pb-0"
                 >
                   <strong className="mr-2"> {item.date}</strong>
                   {isNew && (
@@ -181,26 +181,28 @@ const CompanyEarnings = () => {
                               <span className="font-medium">
                                 {item.epsActual}
                               </span>
-                              {item.epsActual !== item.epsEstimated && (
-                                <span
-                                  className={`text-xs ${
-                                    item.epsActual >= item.epsEstimated
-                                      ? 'text-green-600'
-                                      : 'text-red-600'
-                                  }`}
-                                >
-                                  {item.epsActual > item.epsEstimated
-                                    ? '↑'
-                                    : '↓'}
-                                  {
-                                    getPercentageDifference(
-                                      item.epsActual,
-                                      item.epsEstimated,
-                                    ).value
-                                  }
-                                  %
-                                </span>
-                              )}
+                              {item.epsActual !== null &&
+                                item.epsEstimated !== null &&
+                                item.epsActual !== item.epsEstimated && (
+                                  <span
+                                    className={`text-xs ${
+                                      item.epsActual >= item.epsEstimated
+                                        ? 'text-green-600'
+                                        : 'text-red-600'
+                                    }`}
+                                  >
+                                    {item.epsActual > item.epsEstimated
+                                      ? '↑'
+                                      : '↓'}
+                                    {
+                                      getPercentageDifference(
+                                        item.epsActual,
+                                        item.epsEstimated,
+                                      ).value
+                                    }
+                                    %
+                                  </span>
+                                )}
                             </div>
                           </div>
                         </div>
@@ -217,7 +219,7 @@ const CompanyEarnings = () => {
                               Estimated
                             </div>
                             <div className="font-medium">
-                              {formatCurrency(item.revenueEstimated)}
+                              {formatCurrency(item?.revenueEstimated)}
                             </div>
                           </div>
                           <div>

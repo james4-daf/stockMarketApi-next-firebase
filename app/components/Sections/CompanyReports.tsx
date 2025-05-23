@@ -1,5 +1,5 @@
 import { useStock } from '@/app/hooks/useStock';
-import { FileText } from 'lucide-react';
+import { ExternalLink, FileText } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
@@ -11,13 +11,6 @@ type Report = {
   accessionNumber: string;
   primaryDocument: string;
 };
-
-// type GroupedReports = {
-//     [year: string]: {
-//         tenQ: Report[];
-//         tenK: Report[];
-//     };
-// };
 
 export default function CompanyReports() {
   const { apiKey } = useStock();
@@ -175,7 +168,7 @@ export default function CompanyReports() {
   if (loading) return <p>Loading...</p>;
   if (!defaultYear) return null;
   return (
-    <div className="p-4 ">
+    <div className="p-4 bg-white rounded-xl shadow-sm border border-gray-200 mt-4">
       <h1 className="text-xl font-bold mb-4">{stockTicker} Reports</h1>
 
       <Tabs
@@ -209,6 +202,7 @@ export default function CompanyReports() {
                         >
                           <FileText color="#1bafee" />
                           <span>{report.date} - 10-Q</span>
+                          <ExternalLink size={18} />
                         </a>
                         {/* <button
                           onClick={() => handleGetSummary(report.url)}
@@ -241,9 +235,10 @@ export default function CompanyReports() {
                           href={report.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-blue-500"
+                          className="flex text-blue-500 gap-2 items-center"
                         >
                           {report.date} - 10-K Report
+                          <ExternalLink size={18} />
                         </a>
                       </li>
                     ))}
