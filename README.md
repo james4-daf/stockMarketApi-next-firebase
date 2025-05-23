@@ -4,6 +4,8 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 https://site.financialmodelingprep.com/developer/docs/dashboard
 
+npx tsc --noEmit
+
 First, run the development server:
 
 ```bash

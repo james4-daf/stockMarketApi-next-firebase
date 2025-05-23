@@ -20,10 +20,6 @@ export default function CompanyReports() {
   const [tenQReports, setTenQReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
   const [defaultYear, setDefaultYear] = useState<string | null>(null);
-  const [summaries, setSummaries] = useState<{ [url: string]: string }>({});
-  const [loadingSummary, setLoadingSummary] = useState<{
-    [url: string]: boolean;
-  }>({});
 
   useEffect(() => {
     if (!stockTicker) return;
@@ -96,37 +92,6 @@ export default function CompanyReports() {
 
     fetchReports();
   }, [stockTicker, apiKey]);
-
-  const handleGetSummary = async (reportUrl: string) => {
-    setLoadingSummary((prev) => ({ ...prev, [reportUrl]: true }));
-    setSummaries((prev) => ({ ...prev, [reportUrl]: '' }));
-    try {
-      const res = await fetch('/api/aireportsummary', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ url: reportUrl }),
-      });
-
-      const data = await res.json();
-      if (res.status === 429) {
-        setSummaries((prev) => ({
-          ...prev,
-          [reportUrl]: '⚠️ Rate limit hit. Please wait before trying again.',
-        }));
-      } else {
-        setSummaries((prev) => ({ ...prev, [reportUrl]: data.summary }));
-      }
-    } catch (err) {
-      setSummaries((prev) => ({
-        ...prev,
-        [reportUrl]: `❌ Something went wrong. ${err}`,
-      }));
-    } finally {
-      setLoadingSummary((prev) => ({ ...prev, [reportUrl]: false }));
-    }
-  };
 
   const groupByYear = (reports: Report[]) => {
     return reports.reduce((acc: { [year: number]: Report[] }, report) => {
@@ -204,22 +169,6 @@ export default function CompanyReports() {
                           <span>{report.date} - 10-Q</span>
                           <ExternalLink size={18} />
                         </a>
-                        {/* <button
-                          onClick={() => handleGetSummary(report.url)}
-                          className="text-sm text-blue-500 underline ml-6"
-                        >
-                          Get Summary
-                        </button> */}
-                        {loadingSummary[report.url] && (
-                          <p className="text-sm text-gray-500">
-                            Loading summary...
-                          </p>
-                        )}
-                        {summaries[report.url] && (
-                          <p className="mt-1 text-sm text-gray-700">
-                            {summaries[report.url]}
-                          </p>
-                        )}
                       </li>
                     ))}
                   </ul>

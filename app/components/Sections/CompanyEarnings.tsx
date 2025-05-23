@@ -2,7 +2,6 @@ import { useFetchWithApiLimit } from '@/app/hooks/useFetchWithApiLimit';
 import { useStock } from '@/app/hooks/useStock';
 import { notFound, useParams } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
-import { Separator } from '../ui/separator';
 
 interface Earnings {
   symbol: string;
@@ -30,9 +29,9 @@ export function formatDifference(amount: number): string {
 
 const CompanyEarnings = () => {
   const { apiKey } = useStock();
-  const { fetchWithApiLimit, apiError, clearError } = useFetchWithApiLimit();
+  const { apiError, clearError } = useFetchWithApiLimit();
   const [earnings, setEarnings] = useState<Earnings[]>([]);
-  const [earningsMiss, setEarningsMiss] = useState<boolean | null>(null);
+  // const [earningsMiss, setEarningsMiss] = useState<boolean | null>(null);
 
   const params = useParams<{ stockTicker: string }>();
   const { stockTicker } = params;
@@ -54,9 +53,6 @@ const CompanyEarnings = () => {
       notation: 'compact',
       maximumFractionDigits: 1,
     }).format(amount);
-  };
-  const formatNumber = (num: number) => {
-    return num.toFixed(3);
   };
 
   const fetched = useRef(false);
@@ -98,18 +94,18 @@ const CompanyEarnings = () => {
         ); // Replace with your actual API endpoint
         const data: Earnings[] = await response.json();
         // if epsActual is more than epsEstimated, use setEarningsMiss to true else false
-        if (
-          data.some(
-            (item) =>
-              item.epsActual !== null &&
-              item.epsEstimated !== null &&
-              item.epsActual > item.epsEstimated,
-          )
-        ) {
-          setEarningsMiss(false);
-        } else {
-          setEarningsMiss(true);
-        }
+        // if (
+        //   data.some(
+        //     (item) =>
+        //       item.epsActual !== null &&
+        //       item.epsEstimated !== null &&
+        //       item.epsActual > item.epsEstimated,
+        //   )
+        // ) {
+        //   setEarningsMiss(false);
+        // } else {
+        //   setEarningsMiss(true);
+        // }
 
         // Filter out objects where epsActual is null
         const filteredEarnings = data.filter((item) => item.epsActual !== null);
@@ -178,9 +174,11 @@ const CompanyEarnings = () => {
                           <div>
                             <div className="text-sm text-gray-500">Actual</div>
                             <div className="flex items-center gap-2">
-                              <span className="font-medium">
-                                {item.epsActual}
-                              </span>
+                              {item.epsActual && (
+                                <span className="font-medium">
+                                  {item.epsActual}
+                                </span>
+                              )}
                               {item.epsActual !== null &&
                                 item.epsEstimated !== null &&
                                 item.epsActual !== item.epsEstimated && (
@@ -218,32 +216,41 @@ const CompanyEarnings = () => {
                             <div className="text-sm text-gray-500">
                               Estimated
                             </div>
-                            <div className="font-medium">
-                              {formatCurrency(item?.revenueEstimated)}
-                            </div>
+                            {item.revenueEstimated && (
+                              <div className="font-medium">
+                                {formatCurrency(item?.revenueEstimated)}
+                              </div>
+                            )}
                           </div>
                           <div>
                             <div className="text-sm text-gray-500">Actual</div>
                             <div className="flex items-center gap-2">
-                              <span className="font-medium">
-                                {formatCurrency(item.revenueActual)}
-                              </span>
-                              {item.revenueActual !== item.revenueEstimated && (
-                                <span
-                                  className={`text-xs ${
-                                    item.revenueActual >= item.revenueEstimated
-                                      ? 'text-green-600'
-                                      : 'text-red-600'
-                                  }`}
-                                >
-                                  {item.revenueActual > item.revenueEstimated
-                                    ? '↑'
-                                    : '↓'}
-                                  {formatDifference(
-                                    item.revenueActual - item.revenueEstimated,
-                                  )}
+                              {item.revenueActual && (
+                                <span className="font-medium">
+                                  {formatCurrency(item.revenueActual)}
                                 </span>
                               )}
+                              {item.revenueActual &&
+                                item.revenueEstimated &&
+                                item.revenueActual !==
+                                  item.revenueEstimated && (
+                                  <span
+                                    className={`text-xs ${
+                                      item.revenueActual >=
+                                      item.revenueEstimated
+                                        ? 'text-green-600'
+                                        : 'text-red-600'
+                                    }`}
+                                  >
+                                    {item.revenueActual > item.revenueEstimated
+                                      ? '↑'
+                                      : '↓'}
+                                    {formatDifference(
+                                      item.revenueActual -
+                                        item.revenueEstimated,
+                                    )}
+                                  </span>
+                                )}
                             </div>
                           </div>
                         </div>
