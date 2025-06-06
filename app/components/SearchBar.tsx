@@ -52,12 +52,12 @@ export function SearchBar() {
   };
 
   return (
-    <div className="flex 1 p-2 overflow-y-auto">
+    <div className="flex 1 p-2 overflow-y-auto max-w-md mx-auto">
       <form
         onSubmit={stockSearch}
         className="relative w-full max-w-2xl mx-auto"
       >
-        <div className=" w-full">
+        <div className=" w-full ma">
           <input
             className="w-full px-4 py-3 pl-4 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
             value={searchText}

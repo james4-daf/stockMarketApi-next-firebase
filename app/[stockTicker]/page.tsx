@@ -144,8 +144,8 @@ export default function StockPage() {
     }
   };
   return (
-    <div className="flex-1 p-8 overflow-y-auto">
-      <div className="max-w-5xl mx-auto">
+    <div className="min-h-screen max-w-7xl mx-auto px-4 py-8">
+      <div className="flex flex-col gap-6">
         {stockData && (
           <StockDetails
             stockData={stockData}
@@ -156,13 +156,6 @@ export default function StockPage() {
         {loading && <p>Loading stock data...</p>}
 
         {error && <p className="text-red-500">Error: {error}</p>}
-        {!loading && (
-          <div className="flex">
-            <div className="flex justify-center items-center w-full">
-              <div className="columns-2"></div>
-            </div>
-          </div>
-        )}
       </div>
       <Separator className="mt-6" />
       <Financials />

@@ -20,11 +20,6 @@ import {
 // Menu items.
 const items = [
   {
-    title: 'Search',
-    url: '#',
-    icon: Search,
-  },
-  {
     title: 'Watchlist',
     url: '/watchlist',
     icon: Eye,

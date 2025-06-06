@@ -18,12 +18,12 @@ export default function StockLayout({
     return <LoginFull />; // Show centered login when not logged in
   }
   return (
-    <>
+    <div className=" min-h-screen max-w-7xl mx-auto px-4 py-8">
       <Header />
-      <div className="flex gap-[20px] flex-col items-center">
+      <div className="flex flex-col mx-auto">
         <AppSidebar /> {/* Sidebar only appears for authenticated users */}
         <main className="flex-1">{children}</main>
       </div>
-    </>
+    </div>
   );
 }

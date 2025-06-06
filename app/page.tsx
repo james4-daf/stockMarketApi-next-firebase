@@ -19,7 +19,7 @@ export default function Home() {
   return (
     <div className="flex-1 px-4 overflow-y-auto">
       <div className="max-w-5xl mx-auto">
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
+        <div className="">
           <Watchlist />
         </div>
       </div>

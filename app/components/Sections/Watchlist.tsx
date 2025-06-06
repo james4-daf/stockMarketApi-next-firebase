@@ -128,9 +128,9 @@ export default function Watchlist() {
   return (
     <div className="p-4">
       <Header />
-      <h2 className="text-xl font-bold">Watchlist</h2>
+      <h2 className="text-2xl font-bold my-8 text-center">Watchlist</h2>
 
-      <Table>
+      <Table className="max-w-3xl mx-auto">
         <TableHeader>
           <TableRow>
             <TableHead className="w-[100px]">Ticker</TableHead>

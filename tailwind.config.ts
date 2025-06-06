@@ -27,6 +27,7 @@ export default {
         ],
       },
       colors: {
+        brand: '#dfd4fe',
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
         card: {

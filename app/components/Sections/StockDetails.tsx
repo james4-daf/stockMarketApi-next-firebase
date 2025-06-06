@@ -27,7 +27,7 @@ export const StockDetails = ({
   const { stockTicker } = params;
   const { keyFeaturesData } = useKeyFeatures(stockTicker);
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 transition-all hover:shadow-md">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 transition-all hover:shadow-md ">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between">
         <div className="flex items-center mb-4 md:mb-0">
           <div className="w-16 h-16 mr-4 flex-shrink-0">
