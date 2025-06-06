@@ -2,7 +2,7 @@
 import { useStock } from '@/app/hooks/useStock';
 import { useEffect, useState } from 'react';
 
-export function useOpenOrClosed(stockTicker: string | undefined) {
+export function useOpenOrClosed() {
   const { apiKey } = useStock();
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -21,7 +21,7 @@ export function useOpenOrClosed(stockTicker: string | undefined) {
         }
         const json = await response.json();
         const { isMarketOpen } = json[0];
-        setOpenOrClosed({ isMarketOpen });
+        setOpenOrClosed(isMarketOpen);
       } catch (error) {
         setError(error instanceof Error ? error.message : 'An error occurred.');
       } finally {
@@ -32,5 +32,5 @@ export function useOpenOrClosed(stockTicker: string | undefined) {
     fetchOpenHours();
   }, [apiKey]);
 
-  return { loading, error, setOpenOrClosed };
+  return { loading, error, openOrClosed };
 }

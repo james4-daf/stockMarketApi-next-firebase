@@ -1,7 +1,5 @@
 import type { Metadata } from 'next';
 import AppContent from './AppContent';
-import { AppSidebar } from './components/Sections/AppSidebar';
-import { SidebarProvider, SidebarTrigger } from './components/ui/sidebar';
 import './globals.css';
 
 export const metadata: Metadata = {

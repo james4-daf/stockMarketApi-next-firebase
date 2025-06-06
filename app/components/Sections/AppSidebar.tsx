@@ -1,5 +1,5 @@
 'use client';
-import { Eye, LogOut, Search, UserCog } from 'lucide-react';
+import { Eye, LogOut, UserCog } from 'lucide-react';
 
 import { signOutFromGoogle } from '@/app/firebase/firebase';
 import { useAuth } from '@/app/hooks/useAuth';
