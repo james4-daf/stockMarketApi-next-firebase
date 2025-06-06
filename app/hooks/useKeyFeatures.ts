@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 interface KeyFeatures {
   peRatioTTM: number;
   dividendYielPercentageTTM: number;
+  payoutRatioTTM: number;
 }
 
 export function useKeyFeatures(stockTicker: string | undefined) {
@@ -29,8 +30,13 @@ export function useKeyFeatures(stockTicker: string | undefined) {
           throw new Error(`Error ${response.status}: ${response.statusText}`);
         }
         const json = await response.json();
-        const { peRatioTTM, dividendYielPercentageTTM } = json[0];
-        setKeyFeaturesData({ peRatioTTM, dividendYielPercentageTTM });
+        const { peRatioTTM, dividendYielPercentageTTM, payoutRatioTTM } =
+          json[0];
+        setKeyFeaturesData({
+          peRatioTTM,
+          dividendYielPercentageTTM,
+          payoutRatioTTM,
+        });
       } catch (error) {
         setError(error instanceof Error ? error.message : 'An error occurred.');
       } finally {

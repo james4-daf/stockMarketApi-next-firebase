@@ -102,6 +102,12 @@ export const StockDetails = ({
                   </p>
                 </div>
               )}
+              {keyFeaturesData.payoutRatioTTM > 0 && (
+                <div className="bg-gray-50 p-3 rounded-lg">
+                  <p className="text-gray-500 text-sm">Payout Ratio</p>
+                  <p>{Math.round(keyFeaturesData.payoutRatioTTM * 100)}%</p>
+                </div>
+              )}
             </>
           )}
         </div>

@@ -52,14 +52,11 @@ export function SearchBar() {
   };
 
   return (
-    <div className="flex 1 p-2 overflow-y-auto max-w-md mx-auto">
-      <form
-        onSubmit={stockSearch}
-        className="relative w-full max-w-2xl mx-auto"
-      >
-        <div className=" w-full ma">
+    <div className="relative w-full max-w-2xl mx-auto m-4 p-4">
+      <form onSubmit={stockSearch} className=" w-full">
+        <div className="  ">
           <input
-            className="w-full px-4 py-3 pl-4 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+            className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
             value={searchText}
             type="text"
             placeholder="Enter a stock ticker e.g. TSLA"
@@ -80,7 +77,7 @@ export function SearchBar() {
           ) : (
             <button
               type="button"
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-black"
+              className="absolute right-6 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-black"
               onClick={() => {
                 setSearchText('');
                 setSuggestions([]);
@@ -93,19 +90,22 @@ export function SearchBar() {
       </form>
 
       {suggestions?.length > 0 && (
-        <ul className="absolute bg-white border border-gray-300 w-[300px] mt-1 rounded-md shadow-lg">
+        <ul className="absolute w-full z-10 top-full left-0 bg-white border-x border-b border-gray-300 rounded-b-md shadow-md">
           {suggestions.map((stock: SearchBarStocks) => (
-            <li
-              key={stock.symbol}
-              className="p-2 hover:bg-gray-100 cursor-pointer"
-              onClick={() => {
-                router.push(`/${stock.symbol}`);
-                setSearchText('');
-                setSuggestions([]);
-              }}
-            >
-              {stock.symbol} - {stock.name}
-            </li>
+            <>
+              <li
+                key={stock.symbol}
+                className="p-2 hover:bg-gray-100 cursor-pointer"
+                onClick={() => {
+                  router.push(`/${stock.symbol}`);
+                  setSearchText('');
+                  setSuggestions([]);
+                }}
+              >
+                {stock.symbol} - {stock.name}
+              </li>
+              <hr className="border-gray-200" />
+            </>
           ))}
         </ul>
       )}

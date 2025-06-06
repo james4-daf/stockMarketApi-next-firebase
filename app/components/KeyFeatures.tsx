@@ -19,6 +19,7 @@ export default function KeyFeatures() {
   const [keyFeaturesData, setKeyFeaturesData] = useState<{
     peRatioTTM: number;
     dividendYielPercentageTTM: number;
+    payoutRatioTTM?: number;
   } | null>(null);
 
   const fetched = useRef(false);
