@@ -1,13 +1,14 @@
 'use client';
 import { signInAnonymously } from 'firebase/auth';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { auth } from '../firebase/firebase';
 import { Button } from './ui/button';
 import GoogleLoginButton from './ui/googleLoginButton';
 
 export default function LoginFull() {
   const pathname = usePathname();
+  const router = useRouter();
   console.log(pathname);
   return (
     <div className="flex items-center justify-center min-h-screen px-8">
@@ -57,6 +58,7 @@ export default function LoginFull() {
               onClick={async () => {
                 try {
                   await signInAnonymously(auth);
+                  router.push('/');
                 } catch (error: unknown) {
                   if (error instanceof Error) {
                     alert('Guest login failed: ' + error.message);
