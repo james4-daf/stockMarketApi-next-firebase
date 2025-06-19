@@ -1,9 +1,14 @@
 'use client';
+import { signInAnonymously } from 'firebase/auth';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
+import { auth } from '../firebase/firebase';
 import { Button } from './ui/button';
 import GoogleLoginButton from './ui/googleLoginButton';
 
 export default function LoginFull() {
+  const pathname = usePathname();
+  console.log(pathname);
   return (
     <div className="flex items-center justify-center min-h-screen px-8">
       <div className="bg-brand rounded-3xl border  border-gray-800 w-full  p-10 space-y-6 relative max-w-sm">
@@ -45,6 +50,21 @@ export default function LoginFull() {
           </div>
 
           <Button className="w-full">Sign in</Button>
+          {pathname === '/guest' && (
+            <Button
+              className="w-full"
+              variant="outline"
+              onClick={async () => {
+                try {
+                  await signInAnonymously(auth);
+                } catch (error: any) {
+                  alert('Guest login failed: ' + error.message);
+                }
+              }}
+            >
+              Continue as Guest
+            </Button>
+          )}
         </div>
       </div>
     </div>

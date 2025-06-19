@@ -93,19 +93,6 @@ const CompanyEarnings = () => {
           `https://financialmodelingprep.com/stable/earnings?symbol=${stockTicker}&limit=5&apikey=${apiKey}`,
         ); // Replace with your actual API endpoint
         const data: Earnings[] = await response.json();
-        // if epsActual is more than epsEstimated, use setEarningsMiss to true else false
-        // if (
-        //   data.some(
-        //     (item) =>
-        //       item.epsActual !== null &&
-        //       item.epsEstimated !== null &&
-        //       item.epsActual > item.epsEstimated,
-        //   )
-        // ) {
-        //   setEarningsMiss(false);
-        // } else {
-        //   setEarningsMiss(true);
-        // }
 
         // Filter out objects where epsActual is null
         const filteredEarnings = data.filter((item) => item.epsActual !== null);
@@ -135,7 +122,7 @@ const CompanyEarnings = () => {
         </div>
       )}
       {loading && <p>Loading...</p>}
-      {error && <p className="text-red-500">Error: {error}</p>}
+      {/* {error && <p className="text-red-500">Error: {error}</p>} */}
       {earnings.length > 0 && (
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mt-4">
           <h3 className="text-xl font-semibold mb-6">Recent Earnings</h3>

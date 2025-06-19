@@ -3,6 +3,7 @@ import Header from '@/app/components/Sections/Header';
 import { useAuth } from '@/app/hooks/useAuth';
 import LoginFull from '../components/LoginFull';
 import { AppSidebar } from '../components/Sections/AppSidebar';
+import { SidebarTrigger } from '../components/ui/sidebar';
 
 export default function StockLayout({
   children,
@@ -18,7 +19,7 @@ export default function StockLayout({
     return <LoginFull />; // Show centered login when not logged in
   }
   return (
-    <div className=" min-h-screen max-w-7xl mx-auto px-4 py-8">
+    <div className=" min-h-screen md:max-w-3xl lg:max-w-6xl mx-auto px-4 py-8">
       <Header />
       <div className="flex flex-col mx-auto">
         <AppSidebar /> {/* Sidebar only appears for authenticated users */}

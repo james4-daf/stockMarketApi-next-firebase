@@ -215,65 +215,56 @@ export function DividendsGraph() {
             </ChartContainer>
           </CardContent>
         </Card>
-        <div className="px-6 py-4 flex">
-          <div>
-            <h2 className="text-lg font-semibold mb-2">
-              Yearly Dividend Summary
-            </h2>
-            <ul className="space-y-1">
-              {Object.entries(
-                dividendsData.reduce((acc, { year, dividend }) => {
-                  acc[year] = (acc[year] || 0) + dividend;
-                  return acc;
-                }, {} as Record<number, number>),
-              )
-                .sort(([a], [b]) => Number(b) - Number(a)) // Sort years descending
-                .map(([year, total], index, arr) => {
-                  // const prevYear = arr[index + 1]?.[0]; // Get previous year
-                  const prevTotal = arr[index + 1]?.[1]; // Get previous year’s total
-
-                  const hasFullYear =
-                    dividendsData.filter((d) => d.year === Number(year))
-                      .length === 4;
-                  const percentageChange = prevTotal
-                    ? ((total - prevTotal) / prevTotal) * 100
-                    : null; // Calculate % change
-
-                  return (
-                    <li key={year} className="text-sm">
-                      <strong>{year}:</strong> {total.toFixed(2)}
-                      {!hasFullYear
-                        ? ' (not full year)'
-                        : prevTotal
-                        ? ` (${percentageChange?.toFixed(1)}% ${
-                            percentageChange !== null && percentageChange > 0
-                              ? 'increase'
-                              : 'decrease'
-                          })`
-                        : ''}
-                    </li>
-                  );
-                })}
-            </ul>
+        <div className="px-6 py-4">
+          <h2 className="text-lg font-semibold mb-2">Yearly Dividend Summary</h2>
+          <div className="overflow-x-auto">
+            <table className="table-auto border-collapse min-w-full text-sm">
+              <thead>
+                <tr>
+                  {Object.keys(
+                    dividendsData.reduce((acc, { year }) => {
+                      acc[year] = true;
+                      return acc;
+                    }, {} as Record<number, boolean>),
+                  )
+                    .sort((a, b) => Number(a) - Number(b))
+                    .map((year) => (
+                      <th key={year} className="px-4 py-2 border-b font-semibold text-left whitespace-nowrap">
+                        {year}
+                      </th>
+                    ))}
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  {Object.entries(
+                    dividendsData.reduce((acc, { year, dividend }) => {
+                      acc[year] = (acc[year] || 0) + dividend;
+                      return acc;
+                    }, {} as Record<number, number>),
+                  )
+                    .sort(([a], [b]) => Number(a) - Number(b))
+                    .map(([year, total]) => (
+                      <td key={year} className="px-4 py-2 border-b whitespace-nowrap">
+                        {total.toFixed(2)}
+                      </td>
+                    ))}
+                </tr>
+              </tbody>
+            </table>
           </div>
-          <div>
-            <h2 className="text-lg font-semibold mt-4 mb-2">
-              Dividend Increase Summary
-            </h2>
+
+          <div className="mt-6">
+            <h2 className="text-lg font-semibold mb-2">Dividend Increase Summary</h2>
             <ul className="space-y-1">
               {[
                 { years: 3, avg: avgIncrease3y, total: totalPercentageGain3y },
                 { years: 5, avg: avgIncrease5y, total: totalPercentageGain5y },
-                {
-                  years: 10,
-                  avg: avgIncrease10y,
-                  total: totalPercentageGain10y,
-                },
+                { years: 10, avg: avgIncrease10y, total: totalPercentageGain10y },
               ].map(({ years, avg, total }) => (
                 <li key={years} className="text-sm">
                   <strong>{years} years:</strong>
-                  Avg Increase: {avg ? avg.toFixed(1) + '%' : 'N/A'}, Total
-                  Gain: {total ? total.toFixed(2) + '%' : 'N/A'}
+                  Avg Increase: {avg ? avg.toFixed(1) + '%' : 'N/A'}, Total Gain: {total ? total.toFixed(2) + '%' : 'N/A'}
                 </li>
               ))}
             </ul>

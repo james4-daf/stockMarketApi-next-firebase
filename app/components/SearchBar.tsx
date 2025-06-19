@@ -91,10 +91,10 @@ export function SearchBar() {
 
       {suggestions?.length > 0 && (
         <ul className="absolute w-full z-10 top-full left-0 bg-white border-x border-b border-gray-300 rounded-b-md shadow-md">
-          {suggestions.map((stock: SearchBarStocks) => (
+          {suggestions.map((stock: SearchBarStocks, i) => (
             <>
               <li
-                key={stock.symbol}
+                key={i}
                 className="p-2 hover:bg-gray-100 cursor-pointer"
                 onClick={() => {
                   router.push(`/${stock.symbol}`);
