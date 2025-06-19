@@ -57,8 +57,12 @@ export default function LoginFull() {
               onClick={async () => {
                 try {
                   await signInAnonymously(auth);
-                } catch (error: any) {
-                  alert('Guest login failed: ' + error.message);
+                } catch (error: unknown) {
+                  if (error instanceof Error) {
+                    alert('Guest login failed: ' + error.message);
+                  } else {
+                    alert('Guest login failed.');
+                  }
                 }
               }}
             >

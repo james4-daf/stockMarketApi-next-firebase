@@ -3,7 +3,6 @@ import Header from '@/app/components/Sections/Header';
 import { useAuth } from '@/app/hooks/useAuth';
 import LoginFull from '../components/LoginFull';
 import { AppSidebar } from '../components/Sections/AppSidebar';
-import { SidebarTrigger } from '../components/ui/sidebar';
 
 export default function StockLayout({
   children,

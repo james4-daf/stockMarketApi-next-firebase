@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React from 'react';
 import { AppSidebar } from './components/Sections/AppSidebar';
 import { SidebarProvider, SidebarTrigger } from './components/ui/sidebar';
 import { useAuth } from './hooks/useAuth';
