@@ -10,7 +10,7 @@ import {
 import { getWatchlistData } from '@/app/firebase/firebase';
 import { useAuth } from '@/app/hooks/useAuth';
 import { useStock } from '@/app/hooks/useStock';
-import { ChevronDown, ChevronUp } from 'lucide-react'; // Add at top with other imports
+import { ChevronDown, ChevronUp, Loader2 } from 'lucide-react'; // Add Loader2
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import Header from './Header';
@@ -38,6 +38,7 @@ export default function Watchlist() {
   const fetched = useRef(new Set<string>()); // Track fetched stocks
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const [sortedStocks, setSortedStocks] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const sortStocks = (direction: 'asc' | 'desc') => {
     const sorted = [...watchlistStocks].sort((a, b) => {
@@ -125,57 +126,78 @@ export default function Watchlist() {
     watchlistStocks.forEach(fetchStockData);
   }, [watchlistStocks, apiKey]);
 
+  useEffect(() => {
+    // Set loading to true when watchlist changes
+    setLoading(true);
+  }, [watchlistStocks.length]);
+
+  useEffect(() => {
+    // Set loading to false when all stock data is loaded
+    if (
+      watchlistStocks.length > 0 &&
+      watchlistStocks.every((ticker) => stockData[ticker])
+    ) {
+      setLoading(false);
+    }
+  }, [stockData, watchlistStocks]);
+
   return (
     <div className="p-4">
       <Header />
       <h2 className="text-2xl font-bold my-8 text-center">Watchlist</h2>
 
-      <Table className="max-w-3xl mx-auto">
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-[100px]">Ticker</TableHead>
-            <TableHead>Price</TableHead>
-            <TableHead className="cursor-pointer" onClick={handleSort}>
-              Daily Change %
-              {sortDirection === 'desc' ? (
-                <ChevronDown className="inline-block w-4 h-4 ml-1" />
-              ) : (
-                <ChevronUp className="inline-block w-4 h-4 ml-1" />
-              )}
-            </TableHead>
-            <TableHead className="text-right">52 Week Range</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {sortedStocks.map((stockTicker, index) => (
-            <TableRow key={index}>
-              <TableCell className="font-medium">
-                <Link href={`/${stockTicker.toUpperCase()}`}>
-                  {stockTicker.toUpperCase()}
-                </Link>
-              </TableCell>
-              <TableCell>
-                ${stockData[stockTicker]?.price.toFixed(2) ?? 'Loading...'}
-              </TableCell>
-              <TableCell
-                className={
-                  stockData[stockTicker]?.changePercentage >= 0
-                    ? 'text-green-600'
-                    : 'text-red-500'
-                }
-              >
-                {stockData[stockTicker]?.changePercentage.toFixed(2) ??
-                  'Loading...'}
-                %
-              </TableCell>
-              <TableCell className="text-right">
-                {stockData[stockTicker]?.range ?? 'Loading...'}
-                <Progress value={stockData[stockTicker]?.progress ?? 0} />
-              </TableCell>
+      {loading ? (
+        <div className="max-w-3xl mx-auto flex items-center justify-center h-64">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      ) : (
+        <Table className="max-w-3xl mx-auto">
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[100px]">Ticker</TableHead>
+              <TableHead>Price</TableHead>
+              <TableHead className="cursor-pointer" onClick={handleSort}>
+                Daily Change %
+                {sortDirection === 'desc' ? (
+                  <ChevronDown className="inline-block w-4 h-4 ml-1" />
+                ) : (
+                  <ChevronUp className="inline-block w-4 h-4 ml-1" />
+                )}
+              </TableHead>
+              <TableHead className="text-right">52 Week Range</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {sortedStocks.map((stockTicker, index) => (
+              <TableRow key={index}>
+                <TableCell className="font-medium">
+                  <Link href={`/${stockTicker.toUpperCase()}`}>
+                    {stockTicker.toUpperCase()}
+                  </Link>
+                </TableCell>
+                <TableCell>
+                  ${stockData[stockTicker]?.price.toFixed(2) ?? 'Loading...'}
+                </TableCell>
+                <TableCell
+                  className={
+                    stockData[stockTicker]?.changePercentage >= 0
+                      ? 'text-green-600'
+                      : 'text-red-500'
+                  }
+                >
+                  {stockData[stockTicker]?.changePercentage.toFixed(2) ??
+                    'Loading...'}
+                  %
+                </TableCell>
+                <TableCell className="text-right">
+                  {stockData[stockTicker]?.range ?? 'Loading...'}
+                  <Progress value={stockData[stockTicker]?.progress ?? 0} />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
     </div>
   );
 }

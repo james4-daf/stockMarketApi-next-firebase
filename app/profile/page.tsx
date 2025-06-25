@@ -1,9 +1,8 @@
 'use client';
 
-import { useAuth } from '@/app/hooks/useAuth';
-// import { useAuth } from './hooks/useAuth';
 import Login from '@/app/components/Login';
 import { signOutFromGoogle } from '@/app/firebase/firebase';
+import { useAuth } from '@/app/hooks/useAuth';
 import { LogOut } from 'lucide-react';
 
 export default function ProfilePage() {

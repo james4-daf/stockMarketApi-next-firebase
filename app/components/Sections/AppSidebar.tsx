@@ -1,9 +1,10 @@
 'use client';
-import { Eye, LogOut, UserCog } from 'lucide-react';
+import { Eye, LogOut, NotebookPen, UserCog } from 'lucide-react';
 
 import { signOutFromGoogle } from '@/app/firebase/firebase';
 import { useAuth } from '@/app/hooks/useAuth';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
   Sidebar,
@@ -28,6 +29,11 @@ const items = [
     title: 'Profile',
     url: '/profile',
     icon: UserCog,
+  },
+  {
+    title: 'Notes',
+    url: '/notes',
+    icon: NotebookPen,
   },
 ];
 
@@ -74,10 +80,10 @@ export function AppSidebar() {
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <a href={item.url}>
+                    <Link href={item.url}>
                       <item.icon />
                       <span>{item.title}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
