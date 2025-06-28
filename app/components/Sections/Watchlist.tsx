@@ -80,7 +80,9 @@ export default function Watchlist() {
   };
 
   useEffect(() => {
-    if (watchlistStocks.length === 0) return;
+    if (watchlistStocks.length === 0) {
+      setLoading(false);
+    }
 
     const fetchStockData = async (stockTicker: string) => {
       if (!stockTicker || fetched.current.has(stockTicker)) return; // Prevent duplicate fetches
@@ -142,10 +144,14 @@ export default function Watchlist() {
   }, [stockData, watchlistStocks]);
 
   return (
-    <div className="p-4">
+    <div className="flex flex-col items-center w-full max-w-3xl mx-auto p-4">
       <Header />
       <h2 className="text-2xl font-bold my-8 text-center">Watchlist</h2>
-
+      {watchlistStocks.length === 0 && (
+        <div className="flex justify-center">
+          <p className="text-sm text-gray-500">Watchlist is empty</p>
+        </div>
+      )}
       {loading ? (
         <div className="max-w-3xl mx-auto flex items-center justify-center h-64">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />

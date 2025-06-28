@@ -1,15 +1,31 @@
 'use client';
 import { signInAnonymously } from 'firebase/auth';
 import Image from 'next/image';
+import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { auth } from '../firebase/firebase';
+import { useState } from 'react';
+import { auth, signInWithEmail, signUpWithEmail } from '../firebase/firebase';
 import { Button } from './ui/button';
 import GoogleLoginButton from './ui/googleLoginButton';
 
 export default function LoginFull() {
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [signUpOrLogin, setSignUpOrLogin] = useState<string>('login');
   const pathname = usePathname();
   const router = useRouter();
   console.log(pathname);
+
+  const handleSignUp = async () => {
+    await signUpWithEmail(email, password);
+    router.push('/');
+  };
+
+  const handleSignIn = async () => {
+    await signInWithEmail(email, password);
+    router.push('/');
+  };
+
   return (
     <div className="flex items-center justify-center min-h-screen px-8">
       <div className="bg-brand rounded-3xl border  border-gray-800 w-full  p-10 space-y-6 relative max-w-sm">
@@ -38,6 +54,8 @@ export default function LoginFull() {
               id="email"
               className="w-full p-3 border border-black rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
               placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
           </div>
 
@@ -47,10 +65,38 @@ export default function LoginFull() {
               id="password"
               className="w-full p-3 border border-black rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
               placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
             />
           </div>
+          {signUpOrLogin === 'login' ? (
+            <>
+              <Button className="w-full" onClick={handleSignIn}>
+                Sign in
+              </Button>
+              <p
+                className="text-sm text-gray-500"
+                onClick={() => setSignUpOrLogin('signup')}
+              >
+                Don't have an account?{' '}
+                <span className="text-blue-500 cursor-pointer">Sign up</span>
+              </p>
+            </>
+          ) : (
+            <>
+              <Button className="w-full" onClick={handleSignUp}>
+                Sign up
+              </Button>
+              <p
+                className="text-sm text-gray-500"
+                onClick={() => setSignUpOrLogin('login')}
+              >
+                Already have an account?{' '}
+                <span className="text-blue-500 cursor-pointer">Sign in</span>
+              </p>
+            </>
+          )}
 
-          <Button className="w-full">Sign in</Button>
           {pathname === '/guest' && (
             <Button
               className="w-full"

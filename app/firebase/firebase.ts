@@ -1,8 +1,10 @@
 // firebase.js
 import { initializeApp } from 'firebase/app';
 import {
+  createUserWithEmailAndPassword,
   getAuth,
   GoogleAuthProvider,
+  signInWithEmailAndPassword,
   signInWithPopup,
   signOut,
 } from 'firebase/auth';
@@ -215,6 +217,36 @@ export const deleteNote = async (
     await updateDoc(notesDocRef, { notes: updatedNotes });
   } catch (e) {
     console.error('Error deleting note: ', e);
+    throw e;
+  }
+};
+
+export const signUpWithEmail = async (email: string, password: string) => {
+  try {
+    const userCredential = await createUserWithEmailAndPassword(
+      auth,
+      email,
+      password,
+    );
+    const user = userCredential.user;
+    return user;
+  } catch (e) {
+    console.error('Error signing up with email: ', e);
+    throw e;
+  }
+};
+
+export const signInWithEmail = async (email: string, password: string) => {
+  try {
+    const userCredential = await signInWithEmailAndPassword(
+      auth,
+      email,
+      password,
+    );
+    const user = userCredential.user;
+    return user;
+  } catch (e) {
+    console.error('Error signing in with email: ', e);
     throw e;
   }
 };
