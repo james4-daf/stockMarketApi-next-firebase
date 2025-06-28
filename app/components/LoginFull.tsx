@@ -1,7 +1,6 @@
 'use client';
 import { signInAnonymously } from 'firebase/auth';
 import Image from 'next/image';
-import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { auth, signInWithEmail, signUpWithEmail } from '../firebase/firebase';
@@ -78,7 +77,7 @@ export default function LoginFull() {
                 className="text-sm text-gray-500"
                 onClick={() => setSignUpOrLogin('signup')}
               >
-                Don't have an account?{' '}
+                Don&apos;t have an account?{' '}
                 <span className="text-blue-500 cursor-pointer">Sign up</span>
               </p>
             </>

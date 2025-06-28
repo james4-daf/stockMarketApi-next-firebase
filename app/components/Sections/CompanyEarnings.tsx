@@ -1,5 +1,6 @@
 import { useFetchWithApiLimit } from '@/app/hooks/useFetchWithApiLimit';
 import { useStock } from '@/app/hooks/useStock';
+import { useIsFreeStock } from '@/hooks/isFreeStock';
 import { notFound, useParams } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
 
@@ -28,6 +29,7 @@ export function formatDifference(amount: number): string {
 }
 
 const CompanyEarnings = () => {
+  const isFree = useIsFreeStock();
   const { apiKey } = useStock();
   const { apiError, clearError } = useFetchWithApiLimit();
   const [earnings, setEarnings] = useState<Earnings[]>([]);
@@ -57,7 +59,7 @@ const CompanyEarnings = () => {
 
   const fetched = useRef(false);
   useEffect(() => {
-    if (!stockTicker || fetched.current) return;
+    if (!stockTicker || !isFree || fetched.current) return;
     fetched.current = true;
     const fetchStock = async () => {
       try {
@@ -87,6 +89,7 @@ const CompanyEarnings = () => {
   }, [stockTicker, apiKey]);
 
   useEffect(() => {
+    if (!isFree) return;
     const fetchEarnings = async () => {
       try {
         const response = await fetch(
@@ -109,7 +112,9 @@ const CompanyEarnings = () => {
     };
 
     fetchEarnings();
-  }, []);
+  }, [stockTicker, apiKey, isFree]);
+
+  if (!isFree) return null;
 
   return (
     <>
