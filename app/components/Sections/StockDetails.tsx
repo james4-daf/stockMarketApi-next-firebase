@@ -71,7 +71,7 @@ export const StockDetails = ({
           >
             <p>${stockData?.change}</p>
             <p>
-              ({stockData?.changePercentage >= 0 ? '+' : '-'}
+              ({stockData?.changePercentage >= 0 ? '+' : ''}
               {(stockData?.changePercentage).toFixed(1)}%)
             </p>
           </div>
@@ -82,28 +82,41 @@ export const StockDetails = ({
         <div className="grid grid-cols-2 gap-4">
           {keyFeaturesData && (
             <>
-              <div className="bg-gray-50 p-3 rounded-lg">
+              <div className="bg-gray-50 p-3 rounded-lg shadow-md hover:shadow-xl transition-all  duration-300 hover:bg-gray-100">
                 <p className="text-gray-500 text-sm">TTM P/E</p>
-                <p>{Math.round(keyFeaturesData.peRatioTTM * 100) / 100}</p>
+                <p>{Math.round(keyFeaturesData.peRatioTTM * 100) / 100} </p>
               </div>
-              <div className="bg-gray-50 p-3 rounded-lg">
+              {keyFeaturesData.freeCashFlowYieldTTM > 0 && (
+                <div className="bg-gray-50 p-3 rounded-lg shadow-md hover:shadow-xl transition-all  duration-300 hover:bg-gray-100">
+                  <p className="text-gray-500 text-sm">
+                    TTM Free Cash Flow Yield
+                  </p>
+                  <p>
+                    {(keyFeaturesData.freeCashFlowYieldTTM * 100).toFixed(2)} %
+                  </p>
+                </div>
+              )}
+              <div className="bg-gray-50 p-3 rounded-lg shadow-md hover:shadow-xl transition-all  duration-300 hover:bg-gray-100">
                 <p className="text-gray-500 text-sm">52 Week Range</p>
-                <p>${stockData?.range}</p>
+                <p>
+                  {stockData?.range.split('-')[0]} -{' '}
+                  {stockData?.range.split('-')[1]}
+                </p>
               </div>
 
-              {keyFeaturesData.dividendYielPercentageTTM > 0 && (
-                <div className="bg-gray-50 p-3 rounded-lg">
+              {keyFeaturesData.dividendYieldPercentageTTM > 0 && (
+                <div className="bg-gray-50 p-3 rounded-lg shadow-md hover:shadow-xl transition-all  duration-300 hover:bg-gray-100">
                   <p className="text-gray-500 text-sm">Div Yield</p>
                   <p>
                     {Math.round(
-                      keyFeaturesData.dividendYielPercentageTTM * 100,
-                    ) / 100}
+                      keyFeaturesData.dividendYieldPercentageTTM * 100,
+                    ) / 100}{' '}
                     %
                   </p>
                 </div>
               )}
               {keyFeaturesData.payoutRatioTTM > 0 && (
-                <div className="bg-gray-50 p-3 rounded-lg">
+                <div className="bg-gray-50 p-3 rounded-lg shadow-md hover:shadow-xl transition-all  duration-300 hover:bg-gray-100">
                   <p className="text-gray-500 text-sm">Payout Ratio</p>
                   <p>{Math.round(keyFeaturesData.payoutRatioTTM * 100)}%</p>
                 </div>

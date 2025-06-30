@@ -138,13 +138,13 @@ export default function CompanyReports() {
 
       <Tabs
         defaultValue={defaultYear}
-        className="w-full sm:overflow-x-auto sm:max-w-full overflow-x-scroll max-w-[330px] "
+        className="w-full sm:overflow-x-auto sm:max-w-full overflow-x-scroll max-w-[400px] min-w-[380px]"
       >
-        <TabsList>
+        <TabsList className="gap-2">
           {Object.keys(groupedReports)
             .sort((a, b) => b.localeCompare(a))
             .map((year) => (
-              <TabsTrigger key={year} value={year}>
+              <TabsTrigger key={year} value={year} className="hover:bg-white">
                 {year}
               </TabsTrigger>
             ))}

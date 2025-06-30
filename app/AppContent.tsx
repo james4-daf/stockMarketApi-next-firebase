@@ -1,7 +1,6 @@
 'use client';
 import React from 'react';
-import { AppSidebar } from './components/Sections/AppSidebar';
-import { SidebarProvider, SidebarTrigger } from './components/ui/sidebar';
+
 import { useAuth } from './hooks/useAuth';
 
 function AppContent({ children }: { children: React.ReactNode }) {
@@ -13,15 +12,7 @@ function AppContent({ children }: { children: React.ReactNode }) {
     // or <div>Loading...</div>;
   }
 
-  return (
-    <div>
-      <SidebarProvider>
-        <SidebarTrigger />
-        <AppSidebar />
-        {children}
-      </SidebarProvider>
-    </div>
-  );
+  return <div>{children}</div>;
 }
 
 export default AppContent;

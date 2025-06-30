@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react';
 
 interface KeyFeatures {
   peRatioTTM: number;
-  dividendYielPercentageTTM: number;
+  freeCashFlowYieldTTM: number;
+  dividendYieldPercentageTTM: number;
   payoutRatioTTM: number;
 }
 
@@ -24,17 +25,22 @@ export function useKeyFeatures(stockTicker: string | undefined) {
         setLoading(true);
         setError(null);
         const response = await fetch(
-          `https://financialmodelingprep.com/api/v3/ratios-ttm/${stockTicker}?apikey=${apiKey}`,
+          `https://financialmodelingprep.com/api/v3/key-metrics-ttm/${stockTicker}?apikey=${apiKey}`,
         );
         if (!response.ok) {
           throw new Error(`Error ${response.status}: ${response.statusText}`);
         }
         const json = await response.json();
-        const { peRatioTTM, dividendYielPercentageTTM, payoutRatioTTM } =
-          json[0];
+        const {
+          peRatioTTM,
+          freeCashFlowYieldTTM,
+          dividendYieldPercentageTTM,
+          payoutRatioTTM,
+        } = json[0];
         setKeyFeaturesData({
           peRatioTTM,
-          dividendYielPercentageTTM,
+          freeCashFlowYieldTTM,
+          dividendYieldPercentageTTM,
           payoutRatioTTM,
         });
       } catch (error) {

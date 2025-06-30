@@ -215,10 +215,12 @@ export function DividendsGraph() {
             </ChartContainer>
           </CardContent>
         </Card>
-        <div className="px-6 py-4">
-          <h2 className="text-lg font-semibold mb-2">Yearly Dividend Summary</h2>
-          <div className="overflow-x-auto">
-            <table className="table-auto border-collapse min-w-full text-sm">
+        <div className="px-6 py-4 bg-white rounded-xl shadow-sm border border-gray-200 mt-4 w-full mx-auto">
+          <h2 className="text-lg font-semibold mb-2">
+            Yearly Dividend Summary
+          </h2>
+          <div className="overflow-x-auto w-full max-w-screen-md ">
+            <table className="table-auto border-collapse  text-sm">
               <thead>
                 <tr>
                   {Object.keys(
@@ -229,7 +231,10 @@ export function DividendsGraph() {
                   )
                     .sort((a, b) => Number(a) - Number(b))
                     .map((year) => (
-                      <th key={year} className="px-4 py-2 border-b font-semibold text-left whitespace-nowrap">
+                      <th
+                        key={year}
+                        className="px-4 py-2 border-b font-semibold text-left whitespace-nowrap"
+                      >
                         {year}
                       </th>
                     ))}
@@ -245,7 +250,10 @@ export function DividendsGraph() {
                   )
                     .sort(([a], [b]) => Number(a) - Number(b))
                     .map(([year, total]) => (
-                      <td key={year} className="px-4 py-2 border-b whitespace-nowrap">
+                      <td
+                        key={year}
+                        className="px-4 py-2 border-b whitespace-nowrap"
+                      >
                         {total.toFixed(2)}
                       </td>
                     ))}
@@ -255,16 +263,23 @@ export function DividendsGraph() {
           </div>
 
           <div className="mt-6">
-            <h2 className="text-lg font-semibold mb-2">Dividend Increase Summary</h2>
+            <h2 className="text-lg font-semibold mb-2">
+              Dividend Increase Summary
+            </h2>
             <ul className="space-y-1">
               {[
                 { years: 3, avg: avgIncrease3y, total: totalPercentageGain3y },
                 { years: 5, avg: avgIncrease5y, total: totalPercentageGain5y },
-                { years: 10, avg: avgIncrease10y, total: totalPercentageGain10y },
+                {
+                  years: 10,
+                  avg: avgIncrease10y,
+                  total: totalPercentageGain10y,
+                },
               ].map(({ years, avg, total }) => (
                 <li key={years} className="text-sm">
                   <strong>{years} years:</strong>
-                  Avg Increase: {avg ? avg.toFixed(1) + '%' : 'N/A'}, Total Gain: {total ? total.toFixed(2) + '%' : 'N/A'}
+                  Avg Increase: {avg ? avg.toFixed(1) + '%' : 'N/A'}, Total
+                  Gain: {total ? total.toFixed(2) + '%' : 'N/A'}
                 </li>
               ))}
             </ul>
