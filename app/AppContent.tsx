@@ -1,5 +1,6 @@
 'use client';
 import React from 'react';
+import Navbar from './components/Sections/Navbar';
 
 import { useAuth } from './hooks/useAuth';
 
@@ -12,7 +13,12 @@ function AppContent({ children }: { children: React.ReactNode }) {
     // or <div>Loading...</div>;
   }
 
-  return <div>{children}</div>;
+  return (
+    <div>
+      <Navbar />
+      {children}
+    </div>
+  );
 }
 
 export default AppContent;

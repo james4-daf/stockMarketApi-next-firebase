@@ -1,5 +1,6 @@
-import { SearchBar } from '@/app/components/SearchBar';
+'use client';
 import { useOpenOrClosed } from '@/app/hooks/useOpenOrClosed';
+import Link from 'next/link';
 
 export default function Header() {
   const { loading, error, openOrClosed } = useOpenOrClosed();
@@ -21,7 +22,10 @@ export default function Header() {
           </p>
         )}
       </div>
-      <SearchBar />
+      <div className="flex items-center justify-center gap-2">
+        <Link href="/">Home</Link>
+        <Link href="/watchlist">Watchlist</Link>
+      </div>
     </div>
   );
 }

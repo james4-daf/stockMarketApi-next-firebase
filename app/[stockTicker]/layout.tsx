@@ -17,7 +17,7 @@ export default function StockLayout({
     return <LoginFull />; // Show centered login when not logged in
   }
   return (
-    <div className="w-full min-h-screen max-w-full sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg mx-auto px-2 sm:px-4 py-8">
+    <div className="w-full min-h-screen max-w-full sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg mx-auto px-2 sm:px-4 py-4">
       <Header />
       <div className="flex flex-col mx-auto">
         <main className="flex-1">{children}</main>

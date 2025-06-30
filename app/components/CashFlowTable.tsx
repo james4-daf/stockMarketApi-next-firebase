@@ -1,3 +1,4 @@
+import { useIsFreeStock } from '@/app/hooks/isFreeStock';
 import { useStock } from '@/app/hooks/useStock';
 import {
   Select,
@@ -14,7 +15,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { useIsFreeStock } from '@/hooks/isFreeStock';
 import { Loader2 } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';

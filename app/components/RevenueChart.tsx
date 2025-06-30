@@ -102,13 +102,13 @@ export function RevenueChart() {
       className="w-full text-center"
     >
       <TabsList className="gap-2">
-        <TabsTrigger value="Annual" className="hover:bg-white">
+        <TabsTrigger value="Annual" className="hover:bg-brand">
           Income Statement
         </TabsTrigger>
-        <TabsTrigger value="Balance Sheet" className="hover:bg-white">
+        <TabsTrigger value="Balance Sheet" className="hover:bg-brand">
           Balance Sheet
         </TabsTrigger>
-        <TabsTrigger value="Cash Flow" className="hover:bg-white">
+        <TabsTrigger value="Cash Flow" className="hover:bg-brand">
           Cash Flow
         </TabsTrigger>
       </TabsList>
@@ -127,7 +127,7 @@ export function RevenueChart() {
                   <button
                     key={chart}
                     data-active={activeChart === chart}
-                    className="relative z-30 flex flex-1 flex-col justify-center gap-1 border-t px-6 py-4 text-left even:border-l data-[active=true]:bg-muted/50 sm:border-l sm:border-t-0 sm:px-8 sm:py-6 hover:bg-slate-100"
+                    className="relative z-30 flex flex-1 flex-col justify-center gap-1 border-t px-6 py-4 text-left even:border-l data-[active=true]:bg-muted/50 sm:border-l sm:border-t-0 sm:px-8 sm:py-6 hover:bg-brand"
                     onClick={() => setActiveChart(chart)}
                   >
                     <span className="text-xs text-muted-foreground">

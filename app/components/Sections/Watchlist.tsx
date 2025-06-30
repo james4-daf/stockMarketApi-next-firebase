@@ -144,7 +144,7 @@ export default function Watchlist() {
   }, [stockData, watchlistStocks]);
 
   return (
-    <div className="flex flex-col items-center w-full max-w-3xl mx-auto p-4">
+    <div className="flex flex-col items-center w-full max-w-3xl mx-auto">
       <Header />
       <h2 className="text-2xl font-bold my-8 text-center">Watchlist</h2>
       {watchlistStocks.length === 0 && (

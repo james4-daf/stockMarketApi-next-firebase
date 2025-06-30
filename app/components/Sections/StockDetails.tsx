@@ -82,12 +82,12 @@ export const StockDetails = ({
         <div className="grid grid-cols-2 gap-4">
           {keyFeaturesData && (
             <>
-              <div className="bg-gray-50 p-3 rounded-lg shadow-md hover:shadow-xl transition-all  duration-300 hover:bg-gray-100">
+              <div className="bg-gray-50 p-3 border border-transparent rounded-lg shadow-md hover:shadow-xl hover:border-2 hover:border-brand transition-all  duration-300 hover:bg-gray-100">
                 <p className="text-gray-500 text-sm">TTM P/E</p>
                 <p>{Math.round(keyFeaturesData.peRatioTTM * 100) / 100} </p>
               </div>
               {keyFeaturesData.freeCashFlowYieldTTM > 0 && (
-                <div className="bg-gray-50 p-3 rounded-lg shadow-md hover:shadow-xl transition-all  duration-300 hover:bg-gray-100">
+                <div className="bg-gray-50 p-3 rounded-lg shadow-md hover:shadow-xl transition-all  duration-300 hover:bg-gray-100 hover:border-2 hover:border-brand">
                   <p className="text-gray-500 text-sm">
                     TTM Free Cash Flow Yield
                   </p>
@@ -96,7 +96,7 @@ export const StockDetails = ({
                   </p>
                 </div>
               )}
-              <div className="bg-gray-50 p-3 rounded-lg shadow-md hover:shadow-xl transition-all  duration-300 hover:bg-gray-100">
+              <div className="bg-gray-50 p-3 rounded-lg shadow-md hover:shadow-xl transition-all  duration-300 hover:bg-gray-100 hover:border-2 hover:border-brand">
                 <p className="text-gray-500 text-sm">52 Week Range</p>
                 <p>
                   {stockData?.range.split('-')[0]} -{' '}
@@ -105,7 +105,7 @@ export const StockDetails = ({
               </div>
 
               {keyFeaturesData.dividendYieldPercentageTTM > 0 && (
-                <div className="bg-gray-50 p-3 rounded-lg shadow-md hover:shadow-xl transition-all  duration-300 hover:bg-gray-100">
+                <div className="bg-gray-50 p-3 rounded-lg shadow-md hover:shadow-xl transition-all  duration-300 hover:bg-gray-100 hover:border-2 hover:border-brand">
                   <p className="text-gray-500 text-sm">Div Yield</p>
                   <p>
                     {Math.round(
@@ -116,7 +116,7 @@ export const StockDetails = ({
                 </div>
               )}
               {keyFeaturesData.payoutRatioTTM > 0 && (
-                <div className="bg-gray-50 p-3 rounded-lg shadow-md hover:shadow-xl transition-all  duration-300 hover:bg-gray-100">
+                <div className="bg-gray-50 p-3 rounded-lg shadow-md hover:shadow-xl transition-all  duration-300 hover:bg-gray-100 hover:border-2 hover:border-brand">
                   <p className="text-gray-500 text-sm">Payout Ratio</p>
                   <p>{Math.round(keyFeaturesData.payoutRatioTTM * 100)}%</p>
                 </div>

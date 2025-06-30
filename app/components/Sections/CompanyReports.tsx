@@ -144,7 +144,7 @@ export default function CompanyReports() {
           {Object.keys(groupedReports)
             .sort((a, b) => b.localeCompare(a))
             .map((year) => (
-              <TabsTrigger key={year} value={year} className="hover:bg-white">
+              <TabsTrigger key={year} value={year} className="hover:bg-brand">
                 {year}
               </TabsTrigger>
             ))}

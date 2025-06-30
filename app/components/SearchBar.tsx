@@ -52,7 +52,7 @@ export function SearchBar() {
   };
 
   return (
-    <div className="relative w-full max-w-2xl mx-auto m-4 p-4">
+    <div className="relative w-full ">
       <form onSubmit={stockSearch} className=" w-full">
         <div className="  ">
           <input
