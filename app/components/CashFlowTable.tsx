@@ -53,7 +53,7 @@ const CashFlowTable = () => {
         setLoading(true);
         setError(null);
         const response = await fetch(
-          `https://financialmodelingprep.com/api/v3/cash-flow-statement/${stockTicker}?period=${period}&apikey=${apiKey}`,
+          `https://financialmodelingprep.com/api/v3/cash-flow-statement/${stockTicker}?period=${period}&apikey=${apiKey}&limit=14`,
         );
         if (!response.ok) {
           throw new Error(`Error ${response.status}: ${response.statusText}`);
@@ -96,7 +96,7 @@ const CashFlowTable = () => {
     fetchBalanceSheetStockData();
   }, [stockTicker, apiKey, period]);
   return (
-    <div className="w-full sm:overflow-x-auto sm:max-w-full overflow-x-scroll max-w-[330px]">
+    <div className="w-full sm:overflow-x-auto sm:max-w-full overflow-x-scroll">
       {error && <p className="text-red-500">Error: {error}</p>}
 
       {loading && (
@@ -122,7 +122,9 @@ const CashFlowTable = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="font-bold">Metric</TableHead>
+              <TableHead className="font-bold sticky left-0 z-10 bg-white">
+                Metric
+              </TableHead>
               {cashFlowData &&
                 cashFlowData.map((item: CashFlowDataTypes) => (
                   <TableHead key={item.date} className="text-center font-bold">
@@ -149,7 +151,9 @@ const CashFlowTable = () => {
               },
             ].map(({ label, key }) => (
               <TableRow key={key}>
-                <TableCell className="font-bold">{label}</TableCell>
+                <TableCell className="font-bold sticky left-0 z-10 bg-white">
+                  {label}
+                </TableCell>
                 {cashFlowData &&
                   cashFlowData.map((item: CashFlowDataTypes) => (
                     <TableCell

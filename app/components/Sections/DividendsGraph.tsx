@@ -52,7 +52,7 @@ export function DividendsGraph() {
         setLoading(true);
         setError(null);
         const response = await fetch(
-          `https://financialmodelingprep.com/api/v3/historical-price-full/stock_dividend/${stockTicker}?from=2015-01-01&to=2025-10-10&apikey=${apiKey}`,
+          `https://financialmodelingprep.com/api/v3/historical-price-full/stock_dividend/${stockTicker}?from=2015-01-01&to=2025-10-10&apikey=${apiKey}&limit=14`,
         );
         if (!response.ok) {
           throw new Error(`Error ${response.status}: ${response.statusText}`);

@@ -45,7 +45,7 @@ const BalanceSheetTable = () => {
         setError(null);
 
         const response = await fetch(
-          `https://financialmodelingprep.com/api/v3/balance-sheet-statement/${stockTicker}?period=annual&apikey=${apiKey}`,
+          `https://financialmodelingprep.com/api/v3/balance-sheet-statement/${stockTicker}?period=annual&apikey=${apiKey}&limit=14`,
         );
         if (!response.ok) {
           throw new Error(`Error ${response.status}: ${response.statusText}`);
@@ -101,7 +101,9 @@ const BalanceSheetTable = () => {
           <TableCaption>Balance Sheet Overview</TableCaption>
           <TableHeader>
             <TableRow>
-              <TableHead className="font-bold">Metric</TableHead>
+              <TableHead className="font-bold sticky left-0 z-10 bg-white">
+                Metric
+              </TableHead>
               {balanceSheetData &&
                 balanceSheetData.map((item: BalanceSheetDataTypes) => (
                   <TableHead key={item.date} className="text-center font-bold">
@@ -130,7 +132,9 @@ const BalanceSheetTable = () => {
               },
             ].map(({ label, key }) => (
               <TableRow key={key}>
-                <TableCell className="font-bold">{label}</TableCell>
+                <TableCell className="font-bold sticky left-0 z-10 bg-white">
+                  {label}
+                </TableCell>
                 {balanceSheetData &&
                   balanceSheetData.map((item: BalanceSheetDataTypes) => (
                     <TableCell
