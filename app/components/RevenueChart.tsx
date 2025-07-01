@@ -7,7 +7,7 @@ import {
   TabsTrigger,
 } from '@/app/components/ui/tabs';
 import * as React from 'react';
-import { Bar, BarChart, CartesianGrid, XAxis } from 'recharts';
+import { Bar, BarChart, CartesianGrid, Tooltip, XAxis } from 'recharts';
 
 import {
   Card,
@@ -163,21 +163,8 @@ export function RevenueChart() {
                   minTickGap={32}
                   tickFormatter={(value) => value.toString()}
                 />
-                <ChartTooltip
-                  content={
-                    <ChartTooltipContent
-                      className="w-[150px]"
+                <Tooltip labelFormatter={(label: number) => `${label}`} />
 
-                      // labelFormatter={(value) => {
-                      //     return new Date(value).toLocaleDateString("en-US", {
-                      //         month: "short",
-                      //         day: "numeric",
-                      //         year: "numeric",
-                      //     })
-                      // }}
-                    />
-                  }
-                />
                 <Bar
                   dataKey={activeChart}
                   fill={`var(--color-${activeChart})`}

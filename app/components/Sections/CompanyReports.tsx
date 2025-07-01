@@ -136,19 +136,18 @@ export default function CompanyReports() {
     <div className="p-4 bg-white rounded-xl shadow-sm border border-gray-200 mt-4">
       <h1 className="text-xl font-bold mb-4">{stockTicker} Reports</h1>
 
-      <Tabs
-        defaultValue={defaultYear}
-        className="w-full sm:overflow-x-auto sm:max-w-full overflow-x-scroll max-w-[400px] min-w-[380px]"
-      >
-        <TabsList className="gap-2">
-          {Object.keys(groupedReports)
-            .sort((a, b) => b.localeCompare(a))
-            .map((year) => (
-              <TabsTrigger key={year} value={year} className="hover:bg-brand">
-                {year}
-              </TabsTrigger>
-            ))}
-        </TabsList>
+      <Tabs defaultValue={defaultYear} className="w-full">
+        <div className="overflow-x-auto">
+          <TabsList className="gap-2 flex-nowrap min-w-max pl-2">
+            {Object.keys(groupedReports)
+              .sort((a, b) => b.localeCompare(a))
+              .map((year) => (
+                <TabsTrigger key={year} value={year} className="hover:bg-brand">
+                  {year}
+                </TabsTrigger>
+              ))}
+          </TabsList>
+        </div>
 
         {Object.keys(groupedReports).map((year) => (
           <TabsContent key={year} value={year}>
