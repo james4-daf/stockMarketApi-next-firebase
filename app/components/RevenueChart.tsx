@@ -15,12 +15,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/app/components/ui/card';
-import {
-  ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from '@/app/components/ui/chart';
+import { ChartConfig, ChartContainer } from '@/app/components/ui/chart';
 import { useStock } from '@/app/hooks/useStock';
 import { useParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
