@@ -12,6 +12,12 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from '@/app/components/ui/chart';
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@/app/components/ui/tabs';
 import { useStock } from '@/app/hooks/useStock';
 import { useParams } from 'next/navigation';
 import * as React from 'react';
@@ -26,6 +32,11 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
+const chartLabels = {
+  quarterly: 'Quarterly Dividends',
+  yearly: 'Yearly Dividends',
+};
+
 type DividendsDataTypes = {
   date: string;
   dividend: number;
@@ -35,13 +46,16 @@ export function DividendsGraph() {
   const { apiKey } = useStock();
   const params = useParams<{ stockTicker: string }>();
   const { stockTicker } = params;
-
-  const [dividendsData, setDividendsData] = useState<DividendsDataTypes[]>([]);
+  const [quarterlyData, setQuarterlyData] = useState<DividendsDataTypes[]>([]);
+  const [yearlyData, setYearlyData] = useState<
+    { year: number; dividend: number }[]
+  >([]);
   const fetched = useRef(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeChart, setActiveChart] =
-    useState<keyof typeof chartConfig>('dividends');
+  const [activeChart, setActiveChart] = useState<'quarterly' | 'yearly'>(
+    'quarterly',
+  );
 
   useEffect(() => {
     if (!stockTicker || fetched.current) return;
@@ -59,23 +73,26 @@ export function DividendsGraph() {
         }
         const json = await response.json();
 
-        const extractedData = json.historical
-          .map(({ date, dividend }: DividendsDataTypes) => ({
-            date, // Keep the full date
-            year: new Date(date).getFullYear(), // Extract year for better chart labels
-            dividend,
-          }))
-          .sort(
-            (a: DividendsDataTypes, b: DividendsDataTypes) =>
-              new Date(a.date).getTime() - new Date(b.date).getTime(),
-          ); // Sort oldest to newest
+        // Quarterly: as-is
+        const quarterly = json.historical.map((item: any) => ({
+          date: item.date,
+          dividend: item.adjDividend,
+          year: new Date(item.date).getFullYear(),
+        }));
 
-        setDividendsData(extractedData);
-        // console.log("dividend",extractedData);
-        // if(!extractedData) {
-        //
-        // }
-        console.log('dividend', dividendsData);
+        // Yearly: group and sum
+        const yearlyMap: Record<number, number> = {};
+        quarterly.forEach(
+          ({ year, dividend }: { year: number; dividend: number }) => {
+            yearlyMap[year] = (yearlyMap[year] || 0) + dividend;
+          },
+        );
+        const yearly = Object.entries(yearlyMap)
+          .map(([year, dividend]) => ({ year: Number(year), dividend }))
+          .sort((a, b) => a.year - b.year);
+
+        setQuarterlyData(quarterly.reverse()); // reverse for chronological order
+        setYearlyData(yearly);
       } catch (error) {
         setError(error instanceof Error ? error.message : 'An error occurred.');
       } finally {
@@ -84,7 +101,8 @@ export function DividendsGraph() {
     };
 
     fetchDividendsData();
-  }, [stockTicker, apiKey, dividendsData]);
+  }, [stockTicker, apiKey]);
+
   // Function to calculate the average percentage increase over n years
   const calculateAvgIncrease = (
     data: Array<{ year: number; dividend: number }>,
@@ -133,19 +151,16 @@ export function DividendsGraph() {
   };
 
   // Compute averages for 3, 5, and 10 years
-  const avgIncrease3y = calculateAvgIncrease(dividendsData, 3);
-  const avgIncrease5y = calculateAvgIncrease(dividendsData, 5);
-  const avgIncrease10y = calculateAvgIncrease(dividendsData, 10);
+  const avgIncrease3y = calculateAvgIncrease(yearlyData, 3);
+  const avgIncrease5y = calculateAvgIncrease(yearlyData, 5);
+  const avgIncrease10y = calculateAvgIncrease(yearlyData, 10);
 
-  const totalPercentageGain3y = calculateTotalPercentageGain(dividendsData, 3);
-  const totalPercentageGain5y = calculateTotalPercentageGain(dividendsData, 5);
-  const totalPercentageGain10y = calculateTotalPercentageGain(
-    dividendsData,
-    10,
-  );
+  const totalPercentageGain3y = calculateTotalPercentageGain(yearlyData, 3);
+  const totalPercentageGain5y = calculateTotalPercentageGain(yearlyData, 5);
+  const totalPercentageGain10y = calculateTotalPercentageGain(yearlyData, 10);
 
   return (
-    dividendsData.length > 0 && (
+    setQuarterlyData.length > 0 && (
       <>
         <Separator className="my-8" />
         {loading && <p>Loading...</p>}
@@ -154,69 +169,101 @@ export function DividendsGraph() {
           <Card className="flex-1">
             <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row">
               <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:py-6">
-                <CardTitle>{chartConfig[activeChart].label}</CardTitle>
-              </div>
-              <div className="flex">
-                {['dividends'].map((key) => {
-                  const chart = key as keyof typeof chartConfig;
-                  return (
-                    <button
-                      key={chart}
-                      data-active={activeChart === chart}
-                      className="relative z-30 flex flex-1 flex-col justify-center gap-1 border-t px-6 py-4 text-left even:border-l data-[active=true]:bg-muted/50 sm:border-l sm:border-t-0 sm:px-8 sm:py-6"
-                      onClick={() => setActiveChart(chart)}
-                    >
-                      <span className="text-xs text-muted-foreground">
-                        {chartConfig[chart].label}
-                      </span>
-                    </button>
-                  );
-                })}
+                <CardTitle>Dividends</CardTitle>
               </div>
             </CardHeader>
             <CardContent className="px-2 sm:p-6">
-              <ChartContainer
-                config={chartConfig}
-                className="aspect-auto h-[250px] w-full"
+              <Tabs
+                value={activeChart}
+                onValueChange={(val) =>
+                  setActiveChart(val as 'quarterly' | 'yearly')
+                }
+                className="w-full"
               >
-                <BarChart
-                  accessibilityLayer
-                  data={dividendsData}
-                  margin={{
-                    left: 12,
-                    right: 12,
-                  }}
-                >
-                  <CartesianGrid vertical={false} />
-                  <XAxis
-                    dataKey="year" // Use extracted year for better visualization
-                    tickLine={false}
-                    axisLine={false}
-                    tickMargin={8}
-                    minTickGap={32}
-                  />
-                  <ChartTooltip
-                    content={
-                      <ChartTooltipContent
-                        className="w-[150px]"
-                        labelFormatter={(_, payload) => {
-                          if (!payload || payload.length === 0) return '';
-                          const { payload: data } = payload[0]; // Get data for hovered bar
-                          return new Date(data.date).toLocaleDateString(
-                            'en-US',
-                            {
-                              year: 'numeric',
-                              month: 'short',
-                              day: 'numeric',
-                            },
-                          );
-                        }}
+                <TabsList className="gap-2">
+                  <TabsTrigger value="quarterly" className="hover:bg-brand">
+                    Quarterly
+                  </TabsTrigger>
+                  <TabsTrigger value="yearly" className="hover:bg-brand">
+                    Yearly
+                  </TabsTrigger>
+                </TabsList>
+                <TabsContent value="quarterly">
+                  <ChartContainer
+                    config={chartConfig}
+                    className="aspect-auto h-[250px] w-full"
+                  >
+                    <BarChart
+                      accessibilityLayer
+                      data={quarterlyData}
+                      margin={{ left: 12, right: 12 }}
+                    >
+                      <CartesianGrid vertical={false} />
+                      <XAxis
+                        dataKey="date"
+                        tickLine={false}
+                        axisLine={false}
+                        tickMargin={8}
+                        minTickGap={32}
                       />
-                    }
-                  />
-                  <Bar dataKey="dividend" fill="#66d9c8" />
-                </BarChart>
-              </ChartContainer>
+                      <ChartTooltip
+                        content={
+                          <ChartTooltipContent
+                            className="w-[150px]"
+                            labelFormatter={(_, payload) => {
+                              if (!payload || payload.length === 0) return '';
+                              const { payload: data } = payload[0];
+                              return new Date(data.date).toLocaleDateString(
+                                'en-US',
+                                {
+                                  year: 'numeric',
+                                  month: 'short',
+                                  day: 'numeric',
+                                },
+                              );
+                            }}
+                          />
+                        }
+                      />
+                      <Bar dataKey="dividend" fill="#66d9c8" />
+                    </BarChart>
+                  </ChartContainer>
+                </TabsContent>
+                <TabsContent value="yearly">
+                  <ChartContainer
+                    config={chartConfig}
+                    className="aspect-auto h-[250px] w-full"
+                  >
+                    <BarChart
+                      accessibilityLayer
+                      data={yearlyData}
+                      margin={{ left: 12, right: 12 }}
+                    >
+                      <CartesianGrid vertical={false} />
+                      <XAxis
+                        dataKey="year"
+                        tickLine={false}
+                        axisLine={false}
+                        tickMargin={8}
+                        minTickGap={32}
+                      />
+                      <ChartTooltip
+                        content={
+                          <ChartTooltipContent
+                            className="w-[150px]"
+                            labelFormatter={(_, payload) => {
+                              if (!payload || payload.length === 0) return '';
+                              const { payload: data } = payload[0];
+                              return data.year;
+                            }}
+                          />
+                        }
+                      />
+                      <Bar dataKey="dividend" fill="#66d9c8" />
+                    </BarChart>
+                  </ChartContainer>
+                </TabsContent>
+              </Tabs>
             </CardContent>
           </Card>
           <div className="px-6 py-4 bg-white rounded-xl shadow-sm border border-gray-200 flex-1 lg:max-w-md">
@@ -228,7 +275,7 @@ export function DividendsGraph() {
                 <thead>
                   <tr>
                     {Object.keys(
-                      dividendsData.reduce((acc, { year }) => {
+                      yearlyData.reduce((acc, { year }) => {
                         acc[year] = true;
                         return acc;
                       }, {} as Record<number, boolean>),
@@ -247,7 +294,7 @@ export function DividendsGraph() {
                 <tbody>
                   <tr>
                     {Object.entries(
-                      dividendsData.reduce((acc, { year, dividend }) => {
+                      yearlyData.reduce((acc, { year, dividend }) => {
                         acc[year] = (acc[year] || 0) + dividend;
                         return acc;
                       }, {} as Record<number, number>),

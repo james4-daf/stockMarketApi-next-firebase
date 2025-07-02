@@ -54,13 +54,15 @@ export const StockDetails = ({
               Market Cap: $
               {stockData?.marketCap >= 1e12
                 ? `${(stockData.marketCap / 1e12).toFixed(1)}T`
-                : `${(stockData.marketCap / 1e9).toFixed(2)}B`}
+                : `${(stockData.marketCap / 1e9).toFixed(1)}B`}
             </p>
           </div>
         </div>
         <div className="flex flex-col md:items-end">
           <div className=" items-center mb-2 ">
-            <h3 className="text-2xl font-bold">${stockData?.price}</h3>
+            <h3 className="text-2xl font-bold">
+              ${stockData?.price.toFixed(2)}
+            </h3>
           </div>
           <div
             className={`flex gap-2 ${
