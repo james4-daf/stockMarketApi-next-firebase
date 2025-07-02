@@ -32,14 +32,9 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-const chartLabels = {
-  quarterly: 'Quarterly Dividends',
-  yearly: 'Yearly Dividends',
-};
-
 type DividendsDataTypes = {
   date: string;
-  dividend: number;
+  adjDividend: number;
   year: number; // Added year for better chart labelss
 };
 export function DividendsGraph() {
@@ -74,7 +69,7 @@ export function DividendsGraph() {
         const json = await response.json();
 
         // Quarterly: as-is
-        const quarterly = json.historical.map((item: any) => ({
+        const quarterly = json.historical.map((item: DividendsDataTypes) => ({
           date: item.date,
           dividend: item.adjDividend,
           year: new Date(item.date).getFullYear(),
