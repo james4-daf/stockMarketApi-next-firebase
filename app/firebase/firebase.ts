@@ -250,3 +250,26 @@ export const signInWithEmail = async (email: string, password: string) => {
     throw e;
   }
 };
+
+export const removeStockFromWatchlist = async (
+  userId: string,
+  stock: string,
+) => {
+  const userWatchlistRef = doc(db, 'watchlist', userId);
+
+  try {
+    const docSnap = await getDoc(userWatchlistRef);
+    if (!docSnap.exists()) {
+      throw new Error("User's watchlist not found");
+    }
+
+    const stocks = docSnap.data().stocks || [];
+    const updatedStocks = stocks.filter((s: string) => s !== stock);
+
+    await updateDoc(userWatchlistRef, { stocks: updatedStocks });
+    return updatedStocks;
+  } catch (e) {
+    console.error('Error removing stock from watchlist: ', e);
+    throw e;
+  }
+};

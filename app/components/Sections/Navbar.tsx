@@ -59,14 +59,16 @@ function Navbar() {
   return (
     <div className="bg-brand p-2 sticky top-0 z-50  ">
       <div className="flex items-center justify-between gap-6">
-        <Image
-          src="/informiumText.png"
-          alt="Informium Logo"
-          height={30}
-          width={100}
-          className="top-0 z-50"
-          priority
-        />
+        <Link href="/" className="top-0 z-50 p-2">
+          <Image
+            src="/informiumText.png"
+            alt="Informium Logo"
+            height={30}
+            width={100}
+            className=""
+            priority
+          />
+        </Link>
         <div className="max-w-5xl w-full">
           <SearchBar />
         </div>

@@ -25,6 +25,7 @@ export default function Header() {
       <div className="flex items-center justify-center gap-2">
         <Link href="/">Home</Link>
         <Link href="/watchlist">Watchlist</Link>
+        <Link href="/notes">Notes</Link>
       </div>
     </div>
   );

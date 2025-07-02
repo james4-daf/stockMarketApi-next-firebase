@@ -52,7 +52,7 @@ export function DividendsGraph() {
         setLoading(true);
         setError(null);
         const response = await fetch(
-          `https://financialmodelingprep.com/api/v3/historical-price-full/stock_dividend/${stockTicker}?from=2015-01-01&to=2025-10-10&apikey=${apiKey}&limit=14`,
+          `https://financialmodelingprep.com/api/v3/historical-price-full/stock_dividend/${stockTicker}?from=2015-01-01&to=2025-10-10&apikey=${apiKey}`,
         );
         if (!response.ok) {
           throw new Error(`Error ${response.status}: ${response.statusText}`);
@@ -150,139 +150,152 @@ export function DividendsGraph() {
         <Separator className="my-8" />
         {loading && <p>Loading...</p>}
         {error && <p className="text-red-500">Error: {error}</p>}
-        <Card>
-          <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row">
-            <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:py-6">
-              <CardTitle>{chartConfig[activeChart].label}</CardTitle>
-            </div>
-            <div className="flex">
-              {['dividends'].map((key) => {
-                const chart = key as keyof typeof chartConfig;
-                return (
-                  <button
-                    key={chart}
-                    data-active={activeChart === chart}
-                    className="relative z-30 flex flex-1 flex-col justify-center gap-1 border-t px-6 py-4 text-left even:border-l data-[active=true]:bg-muted/50 sm:border-l sm:border-t-0 sm:px-8 sm:py-6"
-                    onClick={() => setActiveChart(chart)}
-                  >
-                    <span className="text-xs text-muted-foreground">
-                      {chartConfig[chart].label}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </CardHeader>
-          <CardContent className="px-2 sm:p-6">
-            <ChartContainer
-              config={chartConfig}
-              className="aspect-auto h-[250px] w-full"
-            >
-              <BarChart
-                accessibilityLayer
-                data={dividendsData}
-                margin={{
-                  left: 12,
-                  right: 12,
-                }}
+        <div className="flex flex-col lg:flex-row gap-4 justify-between">
+          <Card className="flex-1">
+            <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row">
+              <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:py-6">
+                <CardTitle>{chartConfig[activeChart].label}</CardTitle>
+              </div>
+              <div className="flex">
+                {['dividends'].map((key) => {
+                  const chart = key as keyof typeof chartConfig;
+                  return (
+                    <button
+                      key={chart}
+                      data-active={activeChart === chart}
+                      className="relative z-30 flex flex-1 flex-col justify-center gap-1 border-t px-6 py-4 text-left even:border-l data-[active=true]:bg-muted/50 sm:border-l sm:border-t-0 sm:px-8 sm:py-6"
+                      onClick={() => setActiveChart(chart)}
+                    >
+                      <span className="text-xs text-muted-foreground">
+                        {chartConfig[chart].label}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </CardHeader>
+            <CardContent className="px-2 sm:p-6">
+              <ChartContainer
+                config={chartConfig}
+                className="aspect-auto h-[250px] w-full"
               >
-                <CartesianGrid vertical={false} />
-                <XAxis
-                  dataKey="year" // Use extracted year for better visualization
-                  tickLine={false}
-                  axisLine={false}
-                  tickMargin={8}
-                  minTickGap={32}
-                />
-                <ChartTooltip
-                  content={
-                    <ChartTooltipContent
-                      className="w-[150px]"
-                      labelFormatter={(_, payload) => {
-                        if (!payload || payload.length === 0) return '';
-                        const { payload: data } = payload[0]; // Get data for hovered bar
-                        return new Date(data.date).toLocaleDateString('en-US', {
-                          year: 'numeric',
-                          month: 'short',
-                          day: 'numeric',
-                        });
-                      }}
-                    />
-                  }
-                />
-                <Bar dataKey="dividend" fill="#66d9c8" />
-              </BarChart>
-            </ChartContainer>
-          </CardContent>
-        </Card>
-        <div className="px-6 py-4 bg-white rounded-xl shadow-sm border border-gray-200 mt-4 w-full mx-auto">
-          <h2 className="text-lg font-semibold mb-2">
-            Yearly Dividend Summary
-          </h2>
-          <div className="overflow-x-auto w-full max-w-screen-md ">
-            <table className="table-auto border-collapse  text-sm">
-              <thead>
-                <tr>
-                  {Object.keys(
-                    dividendsData.reduce((acc, { year }) => {
-                      acc[year] = true;
-                      return acc;
-                    }, {} as Record<number, boolean>),
-                  )
-                    .sort((a, b) => Number(a) - Number(b))
-                    .map((year) => (
-                      <th
-                        key={year}
-                        className="px-4 py-2 border-b font-semibold text-left whitespace-nowrap"
-                      >
-                        {year}
-                      </th>
-                    ))}
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  {Object.entries(
-                    dividendsData.reduce((acc, { year, dividend }) => {
-                      acc[year] = (acc[year] || 0) + dividend;
-                      return acc;
-                    }, {} as Record<number, number>),
-                  )
-                    .sort(([a], [b]) => Number(a) - Number(b))
-                    .map(([year, total]) => (
-                      <td
-                        key={year}
-                        className="px-4 py-2 border-b whitespace-nowrap"
-                      >
-                        {total.toFixed(2)}
-                      </td>
-                    ))}
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div className="mt-6">
+                <BarChart
+                  accessibilityLayer
+                  data={dividendsData}
+                  margin={{
+                    left: 12,
+                    right: 12,
+                  }}
+                >
+                  <CartesianGrid vertical={false} />
+                  <XAxis
+                    dataKey="year" // Use extracted year for better visualization
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={8}
+                    minTickGap={32}
+                  />
+                  <ChartTooltip
+                    content={
+                      <ChartTooltipContent
+                        className="w-[150px]"
+                        labelFormatter={(_, payload) => {
+                          if (!payload || payload.length === 0) return '';
+                          const { payload: data } = payload[0]; // Get data for hovered bar
+                          return new Date(data.date).toLocaleDateString(
+                            'en-US',
+                            {
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric',
+                            },
+                          );
+                        }}
+                      />
+                    }
+                  />
+                  <Bar dataKey="dividend" fill="#66d9c8" />
+                </BarChart>
+              </ChartContainer>
+            </CardContent>
+          </Card>
+          <div className="px-6 py-4 bg-white rounded-xl shadow-sm border border-gray-200 flex-1 lg:max-w-md">
             <h2 className="text-lg font-semibold mb-2">
-              Dividend Increase Summary
+              Yearly Dividend Summary
             </h2>
-            <ul className="space-y-1">
-              {[
-                { years: 3, avg: avgIncrease3y, total: totalPercentageGain3y },
-                { years: 5, avg: avgIncrease5y, total: totalPercentageGain5y },
-                {
-                  years: 10,
-                  avg: avgIncrease10y,
-                  total: totalPercentageGain10y,
-                },
-              ].map(({ years, avg, total }) => (
-                <li key={years} className="text-sm">
-                  <strong>{years} years:</strong>
-                  Avg Increase: {avg ? avg.toFixed(1) + '%' : 'N/A'}, Total
-                  Gain: {total ? total.toFixed(2) + '%' : 'N/A'}
-                </li>
-              ))}
-            </ul>
+            <div className="overflow-x-auto w-full">
+              <table className="table-auto border-collapse  text-sm">
+                <thead>
+                  <tr>
+                    {Object.keys(
+                      dividendsData.reduce((acc, { year }) => {
+                        acc[year] = true;
+                        return acc;
+                      }, {} as Record<number, boolean>),
+                    )
+                      .sort((a, b) => Number(a) - Number(b))
+                      .map((year) => (
+                        <th
+                          key={year}
+                          className="px-4 py-2 border-b font-semibold text-left whitespace-nowrap"
+                        >
+                          {year}
+                        </th>
+                      ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    {Object.entries(
+                      dividendsData.reduce((acc, { year, dividend }) => {
+                        acc[year] = (acc[year] || 0) + dividend;
+                        return acc;
+                      }, {} as Record<number, number>),
+                    )
+                      .sort(([a], [b]) => Number(a) - Number(b))
+                      .map(([year, total]) => (
+                        <td
+                          key={year}
+                          className="px-4 py-2 border-b whitespace-nowrap"
+                        >
+                          {total.toFixed(2)}
+                        </td>
+                      ))}
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div className="mt-6">
+              <h2 className="text-lg font-semibold mb-2">
+                Dividend Increase Summary
+              </h2>
+              <ul className="space-y-1">
+                {[
+                  {
+                    years: 3,
+                    avg: avgIncrease3y,
+                    total: totalPercentageGain3y,
+                  },
+                  {
+                    years: 5,
+                    avg: avgIncrease5y,
+                    total: totalPercentageGain5y,
+                  },
+                  {
+                    years: 10,
+                    avg: avgIncrease10y,
+                    total: totalPercentageGain10y,
+                  },
+                ].map(({ years, avg, total }) => (
+                  <li key={years} className="text-sm">
+                    <strong>{years} years:</strong>
+                    Avg Increase: {avg ? avg.toFixed(1) + '%' : 'N/A'}, Total
+                    Gain: {total ? total.toFixed(2) + '%' : 'N/A'}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
       </>

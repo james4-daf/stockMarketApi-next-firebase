@@ -7,10 +7,20 @@ import {
   TableHeader,
   TableRow,
 } from '@/app/components/ui/table';
-import { getWatchlistData } from '@/app/firebase/firebase';
+import {
+  getWatchlistData,
+  removeStockFromWatchlist,
+} from '@/app/firebase/firebase';
 import { useAuth } from '@/app/hooks/useAuth';
 import { useStock } from '@/app/hooks/useStock';
-import { ChevronDown, ChevronUp, Loader2 } from 'lucide-react'; // Add Loader2
+import {
+  ChevronDown,
+  ChevronUp,
+  Edit,
+  Loader2,
+  SquareCheckBig,
+  Trash2,
+} from 'lucide-react'; // Add Loader2
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import Header from './Header';
@@ -39,6 +49,7 @@ export default function Watchlist() {
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const [sortedStocks, setSortedStocks] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const [editing, setEditing] = useState(false);
 
   const sortStocks = (direction: 'asc' | 'desc') => {
     const sorted = [...watchlistStocks].sort((a, b) => {
@@ -77,6 +88,15 @@ export default function Watchlist() {
   const handleSort = () => {
     const direction = sortDirection === 'asc' ? 'desc' : 'asc';
     sortStocks(direction);
+  };
+
+  const handleRemoveStock = async (stockTicker: string) => {
+    if (user?.uid) {
+      setWatchlistStocks(
+        watchlistStocks.filter((ticker) => ticker !== stockTicker),
+      );
+      await removeStockFromWatchlist(user.uid, stockTicker);
+    }
   };
 
   useEffect(() => {
@@ -146,7 +166,29 @@ export default function Watchlist() {
   return (
     <div className="flex flex-col items-center w-full max-w-3xl mx-auto">
       <Header />
-      <h2 className="text-2xl font-bold my-8 text-center">Watchlist</h2>
+      <div className="relative flex items-center w-full my-8">
+        <div className="flex-1" />
+        <h2 className="text-2xl font-bold text-center flex-1">Watchlist</h2>
+        <div className="flex-1 flex justify-end">
+          {!editing ? (
+            <div className="flex items-center gap-2">
+              <p>Edit</p>
+              <Edit
+                className="cursor-pointer hover:bg-brand hover:rounded-sm"
+                onClick={() => setEditing(!editing)}
+              />
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <p>Done</p>
+              <SquareCheckBig
+                className="cursor-pointer hover:bg-green-500 hover:rounded-sm"
+                onClick={() => setEditing(!editing)}
+              />
+            </div>
+          )}
+        </div>
+      </div>
       {watchlistStocks.length === 0 && (
         <div className="flex justify-center">
           <p className="text-sm text-gray-500">Watchlist is empty</p>
@@ -160,6 +202,7 @@ export default function Watchlist() {
         <Table className="max-w-3xl mx-auto">
           <TableHeader>
             <TableRow>
+              {editing && <TableHead className="w-[100px]"></TableHead>}
               <TableHead className="w-[100px]">Ticker</TableHead>
               <TableHead>Price</TableHead>
               <TableHead className="cursor-pointer" onClick={handleSort}>
@@ -176,6 +219,14 @@ export default function Watchlist() {
           <TableBody>
             {sortedStocks.map((stockTicker, index) => (
               <TableRow key={index}>
+                {editing && (
+                  <TableCell>
+                    <Trash2
+                      className="cursor-pointer hover:bg-red-500 hover:rounded-sm"
+                      onClick={() => handleRemoveStock(stockTicker)}
+                    />
+                  </TableCell>
+                )}
                 <TableCell className="font-medium">
                   <Link href={`/${stockTicker.toUpperCase()}`}>
                     {stockTicker.toUpperCase()}
