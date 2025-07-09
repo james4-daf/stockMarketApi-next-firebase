@@ -1,14 +1,10 @@
 'use client';
 
 import { useStock } from '@/app/hooks/useStock';
+import { SearchBarStocks } from '@/lib/types';
 import { Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-
-type SearchBarStocks = {
-  symbol: string;
-  name: string;
-};
 
 export function SearchBar() {
   const { apiKey } = useStock();

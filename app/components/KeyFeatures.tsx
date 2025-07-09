@@ -1,14 +1,8 @@
 'use client';
 import { useStock } from '@/app/hooks/useStock';
+import type { KeyFeatures } from '@/lib/types';
 import { useParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-
-interface KeyFeatures {
-  loading: boolean;
-  error: null | string;
-  peRatioTTM: number;
-  dividendYielPercentageTTM: number;
-}
 
 export default function KeyFeatures() {
   const { apiKey } = useStock();

@@ -3,11 +3,15 @@ import CompanyReports from '@/app/components/Sections/CompanyReports';
 import Financials from '@/app/components/Sections/Financials';
 import { db } from '@/app/firebase/firebase';
 import { useAuth } from '@/app/hooks/useAuth';
+import { StockProps } from '@/lib/types';
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+import { Sparkles } from 'lucide-react';
 import { notFound, useParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import { AiSummaryModal } from '../components/AiSummaryModal';
 import CompanyEarnings from '../components/Sections/CompanyEarnings';
 import { StockDetails } from '../components/Sections/StockDetails';
+import { Button } from '../components/ui/button';
 import { Separator } from '../components/ui/separator';
 import { useStock } from '../hooks/useStock';
 
@@ -20,16 +24,8 @@ export default function StockPage() {
   const [inWatchlist, setInWatchlist] = useState(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [stockData, setStockData] = useState<{
-    symbol: string;
-    marketCap: number;
-    price: number;
-    image: string;
-    companyName: string;
-    range: string;
-    change: number;
-    changePercentage: number;
-  } | null>(null);
+  const [isAiModalOpen, setIsAiModalOpen] = useState(false);
+  const [stockData, setStockData] = useState<StockProps | null>(null);
 
   const fetched = useRef(false);
 
@@ -143,6 +139,7 @@ export default function StockPage() {
       console.error('Error updating watchlist:', error);
     }
   };
+
   return (
     <div className="min-h-screen max-w-7xl mx-auto px-4 py-8">
       <div className="flex flex-col gap-6">
@@ -156,11 +153,32 @@ export default function StockPage() {
         {loading && <p>Loading stock data...</p>}
 
         {error && <p className="text-red-500">Error: {error}</p>}
+
+        {/* AI Summary Button */}
+        {stockData && (
+          <div className="flex justify-center">
+            <Button
+              onClick={() => setIsAiModalOpen(true)}
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700"
+            >
+              <Sparkles className="h-4 w-4" />
+              AI Summary
+            </Button>
+          </div>
+        )}
       </div>
+
       <Separator className="mt-6" />
       <Financials />
       <CompanyEarnings />
       <CompanyReports />
+
+      {/* AI Summary Modal */}
+      <AiSummaryModal
+        isOpen={isAiModalOpen}
+        onClose={() => setIsAiModalOpen(false)}
+        stockTicker={stockTicker}
+      />
     </div>
   );
 }

@@ -1,16 +1,9 @@
 import { useStock } from '@/app/hooks/useStock';
+import { Report } from '@/lib/types';
 import { ExternalLink, FileText } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
-
-type Report = {
-  date: string;
-  url: string;
-  form: string;
-  accessionNumber: string;
-  primaryDocument: string;
-};
 
 export default function CompanyReports() {
   const { apiKey } = useStock();

@@ -1,18 +1,9 @@
 import { useIsFreeStock } from '@/app/hooks/isFreeStock';
 import { useFetchWithApiLimit } from '@/app/hooks/useFetchWithApiLimit';
 import { useStock } from '@/app/hooks/useStock';
+import { Earnings } from '@/lib/types';
 import { notFound, useParams } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
-
-interface Earnings {
-  symbol: string;
-  date: string;
-  epsActual: number | null;
-  epsEstimated: number | null;
-  revenueActual: number | null;
-  revenueEstimated: number | null;
-  lastUpdated: string;
-}
 
 export function formatDifference(amount: number): string {
   const absAmount = Math.abs(amount);

@@ -19,6 +19,7 @@ import {
   TabsTrigger,
 } from '@/app/components/ui/tabs';
 import { useStock } from '@/app/hooks/useStock';
+import { DividendsDataTypes } from '@/lib/types';
 import { useParams } from 'next/navigation';
 import * as React from 'react';
 import { useEffect, useRef, useState } from 'react';
@@ -31,12 +32,6 @@ const chartConfig = {
     color: 'hsl(var(--chart-1))',
   },
 } satisfies ChartConfig;
-
-type DividendsDataTypes = {
-  date: string;
-  adjDividend: number;
-  year: number; // Added year for better chart labelss
-};
 export function DividendsGraph() {
   const { apiKey } = useStock();
   const params = useParams<{ stockTicker: string }>();

@@ -1,23 +1,8 @@
 import { useKeyFeatures } from '@/app/hooks/useKeyFeatures';
+import { StockDetailsProps } from '@/lib/types';
 import { Star } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import React from 'react';
-interface StockProps {
-  symbol: string;
-  marketCap: number;
-  price: number;
-  image: string;
-  companyName: string;
-  range: string;
-  change: number;
-  changePercentage: number;
-}
-
-interface StockDetailsProps {
-  stockData: StockProps;
-  inWatchlist: boolean;
-  toggleWatchlist: () => void;
-}
 export const StockDetails = ({
   stockData,
   inWatchlist,

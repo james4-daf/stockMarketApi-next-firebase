@@ -17,6 +17,7 @@ import {
 } from '@/app/components/ui/card';
 import { ChartConfig, ChartContainer } from '@/app/components/ui/chart';
 import { useStock } from '@/app/hooks/useStock';
+import { FundamentalDataTypes } from '@/lib/types';
 import { useParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import BalanceSheetTable from './BalanceSheetTable';
@@ -32,12 +33,6 @@ const chartConfig = {
     color: 'hsl(var(--chart-2))',
   },
 } satisfies ChartConfig;
-
-type fundamentalDataTypes = {
-  date: string;
-  revenue: number;
-  epsdiluted: number;
-};
 
 export function RevenueChart() {
   const { apiKey } = useStock();
@@ -69,13 +64,13 @@ export function RevenueChart() {
         const json = await response.json();
         // console.log(json);
         const extractedData = json
-          .map(({ date, revenue, epsdiluted }: fundamentalDataTypes) => ({
+          .map(({ date, revenue, epsdiluted }: FundamentalDataTypes) => ({
             date: new Date(date).getFullYear(), // Extract only the year
             revenue: revenue / 1e9, // Convert to billions
             epsdiluted,
           }))
           .sort(
-            (a: fundamentalDataTypes, b: fundamentalDataTypes) =>
+            (a: FundamentalDataTypes, b: FundamentalDataTypes) =>
               Number(a.date) - Number(b.date),
           );
 

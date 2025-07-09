@@ -15,18 +15,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { CashFlowDataTypes } from '@/lib/types';
 import { Loader2 } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-
-interface CashFlowDataTypes {
-  date: string;
-  fiscalYear: string;
-  netIncome: number;
-  stockBasedCompensation: number;
-  freeCashFlow: number;
-  period?: string;
-}
 
 //endpoint
 //https://financialmodelingprep.com/stable/balance-sheet-statement?symbol=AAPL&apikey=
@@ -42,6 +34,16 @@ const CashFlowTable = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Format numbers to show billions with proper decimal places
+  const formatBillions = (value: number): string => {
+    if (value === 0) return '0.0B';
+    if (value > 0) {
+      return `$${value.toFixed(1)}B`;
+    } else {
+      return `-$${Math.abs(value).toFixed(1)}B`;
+    }
+  };
+
   useEffect(() => {
     if (!stockTicker || fetched.current) return;
     fetched.current = true;
@@ -53,7 +55,7 @@ const CashFlowTable = () => {
         setLoading(true);
         setError(null);
         const response = await fetch(
-          `https://financialmodelingprep.com/api/v3/cash-flow-statement/${stockTicker}?period=${period}&apikey=${apiKey}&limit=14`,
+          `https://financialmodelingprep.com/api/v3/cash-flow-statement/${stockTicker}?period=${period}&apikey=${apiKey}&limit=8`,
         );
         if (!response.ok) {
           throw new Error(`Error ${response.status}: ${response.statusText}`);
@@ -135,7 +137,7 @@ const CashFlowTable = () => {
                 ))}
             </TableRow>
           </TableHeader>
-          <TableBody>
+          <TableBody className="content-start text-left">
             {[
               {
                 label: 'Net Income',
@@ -160,7 +162,7 @@ const CashFlowTable = () => {
                       key={`${item.date}-${key}`}
                       className="text-center"
                     >
-                      {item[key]}
+                      {formatBillions(item[key] as number)}
                     </TableCell>
                   ))}
               </TableRow>
