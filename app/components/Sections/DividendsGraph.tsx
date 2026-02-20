@@ -150,7 +150,7 @@ export function DividendsGraph() {
   const totalPercentageGain10y = calculateTotalPercentageGain(yearlyData, 10);
 
   return (
-    setQuarterlyData.length > 0 && (
+    !loading && quarterlyData.length > 0 && (
       <>
         <Separator className="my-8" />
         {loading && <p>Loading...</p>}

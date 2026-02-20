@@ -1,4 +1,5 @@
 'use client';
+import CompanyIRReports from '@/app/components/Sections/CompanyIRReports';
 import CompanyReports from '@/app/components/Sections/CompanyReports';
 import Financials from '@/app/components/Sections/Financials';
 import { db } from '@/app/firebase/firebase';
@@ -56,6 +57,7 @@ export default function StockPage() {
           range,
           change,
           changePercentage,
+          website,
         } = json[0];
         setStockData({
           symbol,
@@ -66,6 +68,7 @@ export default function StockPage() {
           range,
           change,
           changePercentage,
+          website,
         });
       } catch (error) {
         setError(error instanceof Error ? error.message : 'An error occurred.');
@@ -172,6 +175,12 @@ export default function StockPage() {
       <Financials />
       <CompanyEarnings />
       <CompanyReports />
+      {stockData?.website && (
+        <CompanyIRReports
+          website={stockData.website}
+          ticker={stockTicker}
+        />
+      )}
 
       {/* AI Summary Modal */}
       <AiSummaryModal

@@ -60,6 +60,7 @@ export interface StockProps {
   range: string;
   change: number;
   changePercentage: number;
+  website?: string;
 }
 
 export interface StockDetailsProps {
@@ -123,6 +124,32 @@ export interface AiSummaryModalProps {
   isOpen: boolean;
   onClose: () => void;
   stockTicker: string;
+}
+
+// =============================================================================
+// IR Reports Types
+// =============================================================================
+export interface IRReport {
+  title: string;
+  url: string;
+  type: 'annual' | 'quarterly' | 'other';
+  year?: number;
+  quarter?: number;
+  date?: string;
+}
+
+export interface IRCrawlResult {
+  irPageUrl: string;
+  reports: IRReport[];
+  error?: string;
+}
+
+export interface IRReportSummaryModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  report: IRReport | null;
+  file: File | null;
+  ticker: string;
 }
 
 // =============================================================================
