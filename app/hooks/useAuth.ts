@@ -7,6 +7,7 @@ type UserType = {
   uid: string;
   displayName: string;
   email: string;
+  photoURL: string | null;
 };
 
 export const useAuth = () => {
@@ -20,6 +21,7 @@ export const useAuth = () => {
           uid: user.uid,
           displayName: user.displayName || '',
           email: user?.email || '',
+          photoURL: user.photoURL,
         });
       } else {
         setUser(null);

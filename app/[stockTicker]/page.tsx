@@ -2,10 +2,12 @@
 import CompanyIRReports from '@/app/components/Sections/CompanyIRReports';
 import CompanyReports from '@/app/components/Sections/CompanyReports';
 import Financials from '@/app/components/Sections/Financials';
-import { db } from '@/app/firebase/firebase';
+import {
+  isStockInActivePortfolio,
+  toggleStockInActivePortfolio,
+} from '@/app/firebase/firebase';
 import { useAuth } from '@/app/hooks/useAuth';
 import { StockProps } from '@/lib/types';
-import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { Sparkles } from 'lucide-react';
 import { notFound, useParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
@@ -85,20 +87,8 @@ export default function StockPage() {
 
     const checkWatchlist = async () => {
       try {
-        const normalizedTicker = stockTicker.toUpperCase();
-        const watchlistRef = doc(db, 'watchlist', user.uid);
-        const watchlistSnap = await getDoc(watchlistRef);
-
-        if (watchlistSnap.exists()) {
-          const stocks = watchlistSnap.data().stocks || [];
-
-          // Check for the normalized ticker (case-insensitive)
-          const inList = stocks.some(
-            (stock: string) => stock.toUpperCase() === normalizedTicker,
-          );
-
-          setInWatchlist(inList);
-        }
+        const inList = await isStockInActivePortfolio(user.uid, stockTicker);
+        setInWatchlist(inList);
       } catch (error) {
         console.error('Error checking watchlist:', error);
       }
@@ -110,34 +100,12 @@ export default function StockPage() {
   const toggleWatchlist = async () => {
     if (!user?.uid || !stockTicker) return;
 
-    const normalizedTicker = stockTicker.toUpperCase();
-    const watchlistRef = doc(db, 'watchlist', user.uid);
-
     try {
-      const watchlistSnap = await getDoc(watchlistRef);
-      if (watchlistSnap.exists()) {
-        const stocks = watchlistSnap.data().stocks || [];
-        const tickerExists = stocks.some(
-          (stock: string) => stock.toUpperCase() === normalizedTicker,
-        );
-        const updatedStocks = tickerExists
-          ? stocks.filter(
-              (stock: string) => stock.toUpperCase() !== normalizedTicker,
-            ) // Remove stock
-          : [
-              ...stocks.filter(
-                (stock: string, index: number) =>
-                  stocks.indexOf(stock) === index,
-              ),
-              normalizedTicker,
-            ]; // Add stock
-
-        await updateDoc(watchlistRef, { stocks: updatedStocks });
-        setInWatchlist(!inWatchlist);
-      } else {
-        await setDoc(watchlistRef, { stocks: [normalizedTicker] }); // Create document if missing
-        setInWatchlist(true);
-      }
+      const added = await toggleStockInActivePortfolio(
+        user.uid,
+        stockTicker,
+      );
+      setInWatchlist(added);
     } catch (error) {
       console.error('Error updating watchlist:', error);
     }

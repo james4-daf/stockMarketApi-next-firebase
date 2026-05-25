@@ -75,6 +75,20 @@ export interface SearchBarStocks {
 }
 
 // =============================================================================
+// Watchlist / Portfolio Types
+// =============================================================================
+export interface Portfolio {
+  id: string;
+  name: string;
+  stocks: string[];
+}
+
+export interface WatchlistDoc {
+  portfolios: Portfolio[];
+  activePortfolioId: string;
+}
+
+// =============================================================================
 // Key Features Types
 // =============================================================================
 export interface KeyFeatures {

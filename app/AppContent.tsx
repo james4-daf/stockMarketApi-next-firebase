@@ -1,23 +1,21 @@
 'use client';
 import React from 'react';
 import Navbar from './components/Sections/Navbar';
-
+import { ThemeProvider } from './components/ThemeProvider';
 import { useAuth } from './hooks/useAuth';
 
 function AppContent({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
 
   if (!user) {
-    // If user is not authenticated, return null or a loading state
-    return children;
-    // or <div>Loading...</div>;
+    return <ThemeProvider>{children}</ThemeProvider>;
   }
 
   return (
-    <div>
+    <ThemeProvider>
       <Navbar />
       {children}
-    </div>
+    </ThemeProvider>
   );
 }
 

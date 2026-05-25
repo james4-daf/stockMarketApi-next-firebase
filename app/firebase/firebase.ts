@@ -8,6 +8,7 @@ import {
   signInWithPopup,
   signOut,
 } from 'firebase/auth';
+import { Portfolio, WatchlistDoc } from '@/lib/types';
 import {
   collection,
   doc,
@@ -35,21 +36,167 @@ export const db = getFirestore(app);
 // Access a specific collection (for example, 'watchlist')
 // const watchlistRef = collection(db, "watchlist");
 
-// Example: Fetch documents from the 'watchlist' collection
+const DEFAULT_PORTFOLIO: Portfolio = {
+  id: 'default',
+  name: 'Core',
+  stocks: [],
+};
+
+function normalizeTicker(ticker: string) {
+  return ticker.trim().toUpperCase();
+}
+
+async function migrateLegacyWatchlist(
+  userId: string,
+  legacyStocks: string[],
+): Promise<WatchlistDoc> {
+  const migrated: WatchlistDoc = {
+    portfolios: [
+      {
+        ...DEFAULT_PORTFOLIO,
+        stocks: legacyStocks.map(normalizeTicker),
+      },
+    ],
+    activePortfolioId: DEFAULT_PORTFOLIO.id,
+  };
+  const userWatchlistRef = doc(db, 'watchlist', userId);
+  await setDoc(userWatchlistRef, migrated);
+  return migrated;
+}
+
+export const getWatchlistDoc = async (
+  userId: string,
+): Promise<WatchlistDoc> => {
+  const userWatchlistRef = doc(db, 'watchlist', userId);
+  const docSnap = await getDoc(userWatchlistRef);
+
+  if (!docSnap.exists()) {
+    return {
+      portfolios: [{ ...DEFAULT_PORTFOLIO }],
+      activePortfolioId: DEFAULT_PORTFOLIO.id,
+    };
+  }
+
+  const data = docSnap.data();
+
+  if (Array.isArray(data.stocks)) {
+    return migrateLegacyWatchlist(userId, data.stocks);
+  }
+
+  const portfolios = (data.portfolios as Portfolio[]) || [
+    { ...DEFAULT_PORTFOLIO },
+  ];
+  const activePortfolioId =
+    data.activePortfolioId || portfolios[0]?.id || DEFAULT_PORTFOLIO.id;
+
+  return { portfolios, activePortfolioId };
+};
+
+export const setActivePortfolio = async (
+  userId: string,
+  portfolioId: string,
+): Promise<void> => {
+  const userWatchlistRef = doc(db, 'watchlist', userId);
+  const docData = await getWatchlistDoc(userId);
+  await setDoc(userWatchlistRef, { ...docData, activePortfolioId: portfolioId });
+};
+
+export const createPortfolio = async (
+  userId: string,
+  name: string,
+): Promise<Portfolio> => {
+  const docData = await getWatchlistDoc(userId);
+  const newPortfolio: Portfolio = {
+    id: doc(collection(db, 'dummy')).id,
+    name: name.trim() || 'New list',
+    stocks: [],
+  };
+  const userWatchlistRef = doc(db, 'watchlist', userId);
+  await setDoc(userWatchlistRef, {
+    portfolios: [...docData.portfolios, newPortfolio],
+    activePortfolioId: newPortfolio.id,
+  });
+  return newPortfolio;
+};
+
+export const addStockToPortfolio = async (
+  userId: string,
+  portfolioId: string,
+  ticker: string,
+): Promise<string[]> => {
+  const normalized = normalizeTicker(ticker);
+  const docData = await getWatchlistDoc(userId);
+  const portfolios = docData.portfolios.map((p) => {
+    if (p.id !== portfolioId) return p;
+    if (p.stocks.some((s) => s.toUpperCase() === normalized)) return p;
+    return { ...p, stocks: [...p.stocks, normalized] };
+  });
+  const userWatchlistRef = doc(db, 'watchlist', userId);
+  await setDoc(userWatchlistRef, { ...docData, portfolios });
+  return portfolios.find((p) => p.id === portfolioId)?.stocks ?? [];
+};
+
+export const removeStockFromPortfolio = async (
+  userId: string,
+  portfolioId: string,
+  ticker: string,
+): Promise<string[]> => {
+  const normalized = normalizeTicker(ticker);
+  const docData = await getWatchlistDoc(userId);
+  const portfolios = docData.portfolios.map((p) =>
+    p.id === portfolioId
+      ? {
+          ...p,
+          stocks: p.stocks.filter((s) => s.toUpperCase() !== normalized),
+        }
+      : p,
+  );
+  const userWatchlistRef = doc(db, 'watchlist', userId);
+  await setDoc(userWatchlistRef, { ...docData, portfolios });
+  return portfolios.find((p) => p.id === portfolioId)?.stocks ?? [];
+};
+
+export const isStockInActivePortfolio = async (
+  userId: string,
+  ticker: string,
+): Promise<boolean> => {
+  const docData = await getWatchlistDoc(userId);
+  const active = docData.portfolios.find(
+    (p) => p.id === docData.activePortfolioId,
+  );
+  const normalized = normalizeTicker(ticker);
+  return (
+    active?.stocks.some((s) => s.toUpperCase() === normalized) ?? false
+  );
+};
+
+export const toggleStockInActivePortfolio = async (
+  userId: string,
+  ticker: string,
+): Promise<boolean> => {
+  const docData = await getWatchlistDoc(userId);
+  const portfolioId = docData.activePortfolioId;
+  const active = docData.portfolios.find((p) => p.id === portfolioId);
+  const normalized = normalizeTicker(ticker);
+  const exists =
+    active?.stocks.some((s) => s.toUpperCase() === normalized) ?? false;
+
+  if (exists) {
+    await removeStockFromPortfolio(userId, portfolioId, normalized);
+    return false;
+  }
+  await addStockToPortfolio(userId, portfolioId, normalized);
+  return true;
+};
+
+// Backward-compatible: returns stocks from active portfolio
 export const getWatchlistData = async (userId: string) => {
   try {
-    // Reference to the user's watchlist document
-    const userWatchlistRef = doc(db, 'watchlist', userId); // This points to the user's watchlist document
-    const docSnap = await getDoc(userWatchlistRef);
-
-    if (docSnap.exists()) {
-      // If the document exists, get the 'stocks' field (array of strings)
-      const stocks = docSnap.data().stocks; // Assuming 'stocks' is an array of strings
-      return stocks;
-    } else {
-      console.log('No such document!');
-      return [];
-    }
+    const docData = await getWatchlistDoc(userId);
+    const active = docData.portfolios.find(
+      (p) => p.id === docData.activePortfolioId,
+    );
+    return active?.stocks ?? [];
   } catch (e) {
     console.error('Error getting documents: ', e);
     return [];
@@ -255,19 +402,13 @@ export const removeStockFromWatchlist = async (
   userId: string,
   stock: string,
 ) => {
-  const userWatchlistRef = doc(db, 'watchlist', userId);
-
   try {
-    const docSnap = await getDoc(userWatchlistRef);
-    if (!docSnap.exists()) {
-      throw new Error("User's watchlist not found");
-    }
-
-    const stocks = docSnap.data().stocks || [];
-    const updatedStocks = stocks.filter((s: string) => s !== stock);
-
-    await updateDoc(userWatchlistRef, { stocks: updatedStocks });
-    return updatedStocks;
+    const docData = await getWatchlistDoc(userId);
+    return removeStockFromPortfolio(
+      userId,
+      docData.activePortfolioId,
+      stock,
+    );
   } catch (e) {
     console.error('Error removing stock from watchlist: ', e);
     throw e;

@@ -9,7 +9,10 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ['pdf-parse', 'puppeteer'],
   /* config options here */
   images: {
-    domains: ['images.financialmodelingprep.com'],
+    remotePatterns: [
+      { hostname: 'images.financialmodelingprep.com' },
+      { hostname: 'lh3.googleusercontent.com' },
+    ],
   },
 };
 

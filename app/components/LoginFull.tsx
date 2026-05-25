@@ -1,8 +1,9 @@
 'use client';
 import { signInAnonymously } from 'firebase/auth';
 import Image from 'next/image';
+import { useAuth } from '@/app/hooks/useAuth';
 import { usePathname, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { auth, signInWithEmail, signUpWithEmail } from '../firebase/firebase';
 import { Button } from './ui/button';
 import GoogleLoginButton from './ui/googleLoginButton';
@@ -13,16 +14,22 @@ export default function LoginFull() {
   const [signUpOrLogin, setSignUpOrLogin] = useState<string>('login');
   const pathname = usePathname();
   const router = useRouter();
-  console.log(pathname);
+  const { user, loading } = useAuth();
+
+  useEffect(() => {
+    if (!loading && user && pathname === '/login') {
+      router.replace('/watchlist');
+    }
+  }, [user, loading, pathname, router]);
 
   const handleSignUp = async () => {
     await signUpWithEmail(email, password);
-    router.push('/');
+    router.push('/watchlist');
   };
 
   const handleSignIn = async () => {
     await signInWithEmail(email, password);
-    router.push('/');
+    router.push('/watchlist');
   };
 
   return (
@@ -30,8 +37,8 @@ export default function LoginFull() {
       <div className="bg-brand rounded-3xl border  border-gray-800 w-full  p-10 space-y-6 relative max-w-sm">
         <div className="flex justify-center ">
           <Image
-            src="/informiumLogo.png"
-            alt="Informium Logo"
+            src="/tikrchecklogo.png"
+            alt="TikrCheck Logo"
             width={150}
             height={100}
             className=""
@@ -103,7 +110,7 @@ export default function LoginFull() {
               onClick={async () => {
                 try {
                   await signInAnonymously(auth);
-                  router.push('/');
+                  router.push('/watchlist');
                 } catch (error: unknown) {
                   if (error instanceof Error) {
                     alert('Guest login failed: ' + error.message);

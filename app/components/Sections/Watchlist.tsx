@@ -1,4 +1,16 @@
-import { Progress } from '@/app/components/ui/progress';
+'use client';
+
+import { Button } from '@/app/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { Input } from '@/app/components/ui/input';
+import { Skeleton } from '@/app/components/ui/skeleton';
 import {
   Table,
   TableBody,
@@ -7,137 +19,124 @@ import {
   TableHeader,
   TableRow,
 } from '@/app/components/ui/table';
-import {
-  getWatchlistData,
-  removeStockFromWatchlist,
-} from '@/app/firebase/firebase';
+import { Tabs, TabsList, TabsTrigger } from '@/app/components/ui/tabs';
 import { useAuth } from '@/app/hooks/useAuth';
 import { useStock } from '@/app/hooks/useStock';
+import { useWatchlistPortfolios } from '@/app/hooks/useWatchlistPortfolios';
 import {
-  ChevronDown,
-  ChevronUp,
-  Edit,
-  Loader2,
-  SquareCheckBig,
-  Trash2,
-} from 'lucide-react'; // Add Loader2
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Loader2, Plus, Trash2 } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useRef, useState } from 'react';
-import Header from './Header';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { MarketIndexCards } from './MarketIndexCards';
+import { RangeBar } from './RangeBar';
 
-type UserType = {
-  uid: string;
+type StockRow = {
+  price: number;
+  changePercentage: number;
+  range: string;
+  progress: number;
+  companyName: string;
+  marketCap: number;
 };
 
+function formatMarketCap(cap: number) {
+  if (cap >= 1e12) return `${(cap / 1e12).toFixed(2)}T`;
+  if (cap >= 1e9) return `${(cap / 1e9).toFixed(1)}B`;
+  if (cap >= 1e6) return `${(cap / 1e6).toFixed(1)}M`;
+  return cap.toString();
+}
+
+function formatEdtTime(date: Date) {
+  return date.toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+    timeZone: 'America/New_York',
+  });
+}
+
 export default function Watchlist() {
-  const { user } = useAuth() as { user: UserType | null };
+  const { user } = useAuth();
   const { apiKey } = useStock();
+  const {
+    portfolios,
+    activePortfolioId,
+    activeStocks,
+    loading: portfoliosLoading,
+    setActivePortfolioId,
+    addPortfolio,
+    addStock,
+    removeStock,
+  } = useWatchlistPortfolios(user?.uid);
 
-  const [watchlistStocks, setWatchlistStocks] = useState<string[]>([]);
-  const [stockData, setStockData] = useState<
-    Record<
-      string,
-      {
-        price: number;
-        changePercentage: number;
-        range: string;
-        progress: number;
-      }
-    >
-  >({});
-  const fetched = useRef(new Set<string>()); // Track fetched stocks
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
-  const [sortedStocks, setSortedStocks] = useState<string[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [stockData, setStockData] = useState<Record<string, StockRow>>({});
+  const [quotesLoading, setQuotesLoading] = useState(true);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [filter, setFilter] = useState('');
+  const [addTicker, setAddTicker] = useState('');
+  const [sortBy, setSortBy] = useState<'change-desc' | 'change-asc' | 'ticker'>(
+    'change-desc',
+  );
   const [editing, setEditing] = useState(false);
-
-  const sortStocks = (direction: 'asc' | 'desc') => {
-    const sorted = [...watchlistStocks].sort((a, b) => {
-      const changeA = stockData[a]?.changePercentage ?? 0;
-      const changeB = stockData[b]?.changePercentage ?? 0;
-      return direction === 'asc' ? changeA - changeB : changeB - changeA;
-    });
-    setSortedStocks(sorted);
-    setSortDirection(direction);
-  };
+  const [newListName, setNewListName] = useState('');
+  const [newListOpen, setNewListOpen] = useState(false);
+  const fetched = useRef(new Set<string>());
 
   useEffect(() => {
-    if (watchlistStocks.length > 0) {
-      sortStocks('desc');
-    }
-  }, [watchlistStocks, stockData]);
-
-  //   useEffect(() => {
-  //     sortStocks('desc');
-  //   });
+    fetched.current = new Set();
+    setStockData({});
+  }, [activePortfolioId]);
 
   useEffect(() => {
-    if (user?.uid) {
-      const getWatchlist = async () => {
-        try {
-          const data = await getWatchlistData(user.uid);
-          setWatchlistStocks(data);
-        } catch (error) {
-          console.error('Error fetching watchlist:', error);
-        }
-      };
-      getWatchlist();
+    if (activeStocks.length === 0) {
+      setQuotesLoading(false);
+      return;
     }
-  }, [user]);
 
-  const handleSort = () => {
-    const direction = sortDirection === 'asc' ? 'desc' : 'asc';
-    sortStocks(direction);
-  };
-
-  const handleRemoveStock = async (stockTicker: string) => {
-    if (user?.uid) {
-      setWatchlistStocks(
-        watchlistStocks.filter((ticker) => ticker !== stockTicker),
-      );
-      await removeStockFromWatchlist(user.uid, stockTicker);
-    }
-  };
-
-  useEffect(() => {
-    if (watchlistStocks.length === 0) {
-      setLoading(false);
-    }
+    setQuotesLoading(true);
 
     const fetchStockData = async (stockTicker: string) => {
-      if (!stockTicker || fetched.current.has(stockTicker)) return; // Prevent duplicate fetches
-
-      fetched.current.add(stockTicker); // Mark as fetched
+      if (!stockTicker || fetched.current.has(stockTicker)) return;
+      fetched.current.add(stockTicker);
 
       try {
         const response = await fetch(
           `https://financialmodelingprep.com/stable/profile?symbol=${stockTicker}&apikey=${apiKey}`,
         );
-        if (!response.ok) {
-          throw new Error(`Error ${response.status}: ${response.statusText}`);
-        }
+        if (!response.ok) return;
 
         const json = await response.json();
-        if (!json || json.length === 0) return;
+        if (!json?.length) return;
 
-        const { price, changePercentage, range } = json[0]; // Grab only the required fields
-        // Parse the range "121-141" into min and max
-        const [low, high] = range.split('-').map(Number);
-
-        // Calculate the progress percentage (clamped between 0 and 100)
+        const {
+          price,
+          changePercentage,
+          range,
+          companyName,
+          marketCap,
+        } = json[0];
+        const [low, high] = (range || '0-0').split('-').map(Number);
         let progress = 0;
         if (!isNaN(low) && !isNaN(high) && high > low) {
           progress = ((price - low) / (high - low)) * 100;
-          progress = Math.max(0, Math.min(100, progress)); // Clamp between 0 and 100
+          progress = Math.max(0, Math.min(100, progress));
         }
 
-        setStockData((prevData) => ({
-          ...prevData,
+        setStockData((prev) => ({
+          ...prev,
           [stockTicker]: {
             price,
-            changePercentage: changePercentage,
+            changePercentage,
             range,
             progress,
+            companyName: companyName || '',
+            marketCap: marketCap || 0,
           },
         }));
       } catch (error) {
@@ -145,116 +144,265 @@ export default function Watchlist() {
       }
     };
 
-    watchlistStocks.forEach(fetchStockData);
-  }, [watchlistStocks, apiKey]);
+    Promise.all(activeStocks.map(fetchStockData)).then(() => {
+      setQuotesLoading(false);
+      setLastUpdated(new Date());
+    });
+  }, [activeStocks, apiKey]);
 
-  useEffect(() => {
-    // Set loading to true when watchlist changes
-    setLoading(true);
-  }, [watchlistStocks.length]);
-
-  useEffect(() => {
-    // Set loading to false when all stock data is loaded
-    if (
-      watchlistStocks.length > 0 &&
-      watchlistStocks.every((ticker) => stockData[ticker])
-    ) {
-      setLoading(false);
+  const filteredStocks = useMemo(() => {
+    const q = filter.trim().toLowerCase();
+    let list = [...activeStocks];
+    if (q) {
+      list = list.filter((ticker) => {
+        const data = stockData[ticker];
+        return (
+          ticker.toLowerCase().includes(q) ||
+          data?.companyName?.toLowerCase().includes(q)
+        );
+      });
     }
-  }, [stockData, watchlistStocks]);
+    list.sort((a, b) => {
+      if (sortBy === 'ticker') return a.localeCompare(b);
+      const changeA = stockData[a]?.changePercentage ?? 0;
+      const changeB = stockData[b]?.changePercentage ?? 0;
+      return sortBy === 'change-asc' ? changeA - changeB : changeB - changeA;
+    });
+    return list;
+  }, [activeStocks, filter, sortBy, stockData]);
+
+  const handleAddStock = async () => {
+    const ticker = addTicker.trim().toUpperCase();
+    if (!ticker) return;
+    await addStock(ticker);
+    setAddTicker('');
+  };
+
+  const handleCreateList = async () => {
+    const name = newListName.trim();
+    if (!name) return;
+    await addPortfolio(name);
+    setNewListName('');
+    setNewListOpen(false);
+  };
+
+  const symbolCount = activeStocks.length;
+  const updatedLabel = lastUpdated
+    ? formatEdtTime(lastUpdated)
+    : '--:--';
 
   return (
-    <div className="flex flex-col items-center w-full max-w-3xl mx-auto">
-      <Header />
-      <div className="relative flex items-center w-full my-8">
-        <div className="flex-1" />
-        <h2 className="text-2xl font-bold text-center flex-1">Watchlist</h2>
-        <div className="flex-1 flex justify-end">
-          {!editing ? (
-            <div className="flex items-center gap-2">
-              <p>Edit</p>
-              <Edit
-                className="cursor-pointer hover:bg-brand hover:rounded-sm"
-                onClick={() => setEditing(!editing)}
+    <div className="mx-auto w-full max-w-6xl space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">Watchlist</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          {symbolCount} symbol{symbolCount !== 1 ? 's' : ''} · Updated{' '}
+          {updatedLabel} EDT
+        </p>
+      </div>
+
+      <MarketIndexCards />
+
+      {portfoliosLoading ? (
+        <Skeleton className="h-10 w-full max-w-xl" />
+      ) : (
+        <div className="flex flex-wrap items-center gap-2 border-b border-border">
+          <Tabs
+            value={activePortfolioId}
+            onValueChange={(id) => setActivePortfolioId(id)}
+          >
+            <TabsList className="h-auto gap-0 rounded-none bg-transparent p-0">
+              {portfolios.map((p) => (
+                <TabsTrigger
+                  key={p.id}
+                  value={p.id}
+                  className="rounded-none border-b-2 border-transparent bg-transparent px-4 py-2 shadow-none data-[state=active]:border-violet-600 data-[state=active]:bg-transparent data-[state=active]:text-foreground"
+                >
+                  {p.name} {p.stocks.length}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
+
+          <Dialog open={newListOpen} onOpenChange={setNewListOpen}>
+            <DialogTrigger asChild>
+              <Button variant="ghost" size="sm" className="gap-1 text-violet-600">
+                <Plus className="h-4 w-4" />
+                New list
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Create new list</DialogTitle>
+              </DialogHeader>
+              <Input
+                placeholder="List name"
+                value={newListName}
+                onChange={(e) => setNewListName(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleCreateList()}
               />
-            </div>
-          ) : (
-            <div className="flex items-center gap-2">
-              <p>Done</p>
-              <SquareCheckBig
-                className="cursor-pointer hover:bg-green-500 hover:rounded-sm"
-                onClick={() => setEditing(!editing)}
-              />
-            </div>
-          )}
+              <DialogFooter>
+                <Button onClick={handleCreateList}>Create</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
+      )}
+
+      <div className="flex flex-wrap items-center gap-3">
+        <Input
+          placeholder="Filter symbols..."
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          className="h-9 w-44"
+        />
+        <Input
+          placeholder="Add symbol"
+          value={addTicker}
+          onChange={(e) => setAddTicker(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && handleAddStock()}
+          className="h-9 w-36"
+        />
+        <Button
+          onClick={handleAddStock}
+          size="sm"
+          className="h-9 shrink-0 bg-violet-600 hover:bg-violet-700"
+        >
+          <Plus className="mr-1 h-4 w-4" />
+          Add
+        </Button>
+        <div className="ml-auto flex items-center gap-2">
+          <Select
+            value={sortBy}
+            onValueChange={(v) =>
+              setSortBy(v as 'change-desc' | 'change-asc' | 'ticker')
+            }
+          >
+            <SelectTrigger className="h-9 w-[160px] border-0 bg-transparent text-sm text-muted-foreground shadow-none focus:ring-0">
+              <SelectValue placeholder="Sort" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="change-desc">Sort: change desc</SelectItem>
+              <SelectItem value="change-asc">Sort: change asc</SelectItem>
+              <SelectItem value="ticker">Sort: ticker A-Z</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-9 text-muted-foreground"
+            onClick={() => setEditing(!editing)}
+          >
+            {editing ? 'Done' : 'Edit'}
+          </Button>
         </div>
       </div>
-      {watchlistStocks.length === 0 && (
-        <div className="flex justify-center">
-          <p className="text-sm text-gray-500">Watchlist is empty</p>
-        </div>
+
+      {activeStocks.length === 0 && !portfoliosLoading && (
+        <p className="py-12 text-center text-muted-foreground">
+          This list is empty. Add a symbol above.
+        </p>
       )}
-      {loading ? (
-        <div className="max-w-3xl mx-auto flex items-center justify-center h-64">
+
+      {quotesLoading && activeStocks.length > 0 ? (
+        <div className="flex h-48 items-center justify-center">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
-      ) : (
-        <Table className="max-w-3xl mx-auto">
-          <TableHeader>
-            <TableRow>
-              {editing && <TableHead className="w-[100px]"></TableHead>}
-              <TableHead className="w-[100px]">Ticker</TableHead>
-              <TableHead>Price</TableHead>
-              <TableHead className="cursor-pointer" onClick={handleSort}>
-                Daily Change %
-                {sortDirection === 'desc' ? (
-                  <ChevronDown className="inline-block w-4 h-4 ml-1" />
-                ) : (
-                  <ChevronUp className="inline-block w-4 h-4 ml-1" />
-                )}
-              </TableHead>
-              <TableHead className="text-right">52 Week Range</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {sortedStocks.map((stockTicker, index) => (
-              <TableRow key={index}>
-                {editing && (
-                  <TableCell>
-                    <Trash2
-                      className="cursor-pointer hover:bg-red-500 hover:rounded-sm"
-                      onClick={() => handleRemoveStock(stockTicker)}
-                    />
-                  </TableCell>
-                )}
-                <TableCell className="font-medium">
-                  <Link href={`/${stockTicker.toUpperCase()}`}>
-                    {stockTicker.toUpperCase()}
-                  </Link>
-                </TableCell>
-                <TableCell>
-                  ${stockData[stockTicker]?.price.toFixed(2) ?? 'Loading...'}
-                </TableCell>
-                <TableCell
-                  className={
-                    stockData[stockTicker]?.changePercentage >= 0
-                      ? 'text-green-600'
-                      : 'text-red-500'
-                  }
-                >
-                  {stockData[stockTicker]?.changePercentage.toFixed(2) ??
-                    'Loading...'}
-                  %
-                </TableCell>
-                <TableCell className="text-right">
-                  {stockData[stockTicker]?.range ?? 'Loading...'}
-                  <Progress value={stockData[stockTicker]?.progress ?? 0} />
-                </TableCell>
+      ) : activeStocks.length > 0 ? (
+        <div className="overflow-x-auto">
+          <Table className="table-fixed">
+            <TableHeader>
+              <TableRow className="border-b border-border hover:bg-transparent">
+                {editing && <TableHead className="w-10 px-0" />}
+                <TableHead className="w-[32%] pl-0 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  Ticker
+                </TableHead>
+                <TableHead className="w-[14%] text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  Price
+                </TableHead>
+                <TableHead className="w-[12%] text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  Day %
+                </TableHead>
+                <TableHead className="w-[28%] text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  52-Week Range
+                </TableHead>
+                <TableHead className="w-[14%] pr-0 text-right text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  Cap
+                </TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      )}
+            </TableHeader>
+            <TableBody>
+              {filteredStocks.map((stockTicker) => {
+                const data = stockData[stockTicker];
+                const [low, high] = (data?.range || '0-0')
+                  .split('-')
+                  .map(Number);
+
+                return (
+                  <TableRow key={stockTicker}>
+                    {editing && (
+                      <TableCell>
+                        <button
+                          type="button"
+                          onClick={() => removeStock(stockTicker)}
+                          className="text-red-500 hover:text-red-700"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </TableCell>
+                    )}
+                    <TableCell className="pl-0">
+                      <Link
+                        href={`/${stockTicker.toUpperCase()}`}
+                        className="font-semibold hover:text-violet-600"
+                      >
+                        {stockTicker.toUpperCase()}
+                      </Link>
+                      {data?.companyName && (
+                        <p className="text-xs text-muted-foreground">
+                          {data.companyName}
+                        </p>
+                      )}
+                    </TableCell>
+                    <TableCell className="whitespace-nowrap font-medium">
+                      {data ? `$${data.price.toFixed(2)}` : (
+                        <Skeleton className="h-4 w-16" />
+                      )}
+                    </TableCell>
+                    <TableCell
+                      className={`whitespace-nowrap ${
+                        (data?.changePercentage ?? 0) >= 0
+                          ? 'text-green-600'
+                          : 'text-red-500'
+                      }`}
+                    >
+                      {data
+                        ? `${data.changePercentage >= 0 ? '+' : ''}${data.changePercentage.toFixed(2)}%`
+                        : '—'}
+                    </TableCell>
+                    <TableCell>
+                      {data && !isNaN(low) && !isNaN(high) ? (
+                        <RangeBar
+                          low={low}
+                          high={high}
+                          progress={data.progress}
+                        />
+                      ) : (
+                        <Skeleton className="h-8 w-32" />
+                      )}
+                    </TableCell>
+                    <TableCell className="whitespace-nowrap pr-0 text-right text-muted-foreground">
+                      {data?.marketCap
+                        ? formatMarketCap(data.marketCap)
+                        : '—'}
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </div>
+      ) : null}
     </div>
   );
 }

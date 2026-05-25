@@ -1,5 +1,8 @@
-import { Button } from '@/app/components/ui/button';
+'use client';
+
+import { ThemeToggle } from '@/app/components/ThemeToggle';
 import { signOutFromGoogle } from '@/app/firebase/firebase';
+import { useAuth } from '@/app/hooks/useAuth';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,41 +12,97 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { LogOutIcon, UserIcon } from 'lucide-react';
+import { LogOutIcon } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import React from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import { SearchBar } from '../SearchBar';
+import { MarketStatusPill } from './MarketStatusPill';
+import { cn } from '@/lib/utils';
 
-function UserMenu({ handleLogout }: { handleLogout: () => void }) {
+const NAV_LINKS = [
+  { href: '/watchlist', label: 'Home' },
+  { href: '/watchlist', label: 'Watchlist' },
+  { href: '/notes', label: 'Notes' },
+];
+
+function NavLink({
+  href,
+  label,
+  pathname,
+}: {
+  href: string;
+  label: string;
+  pathname: string;
+}) {
+  const isActive =
+    label === 'Watchlist'
+      ? pathname === '/watchlist'
+      : label === 'Notes'
+        ? pathname.startsWith('/notes')
+        : pathname === '/watchlist' || pathname === '/';
+
+  return (
+    <Link
+      href={href}
+      className={cn(
+        'rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
+        isActive
+          ? 'bg-brand/60 text-foreground'
+          : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+      )}
+    >
+      {label}
+    </Link>
+  );
+}
+
+function UserAvatar({
+  displayName,
+  photoURL,
+  onLogout,
+}: {
+  displayName: string;
+  photoURL: string | null;
+  onLogout: () => void;
+}) {
+  const initial = (displayName || 'U').charAt(0).toUpperCase();
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline">
-          <UserIcon className="w-4 h-4" />
-        </Button>
+        <button
+          type="button"
+          className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-violet-600 text-sm font-semibold text-white ring-2 ring-violet-200 dark:ring-violet-800"
+        >
+          {photoURL ? (
+            <Image
+              src={photoURL}
+              alt="Profile"
+              width={36}
+              height={36}
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            initial
+          )}
+        </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56" align="start">
-        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+      <DropdownMenuContent className="w-48" align="end">
+        <DropdownMenuLabel>{displayName || 'My Account'}</DropdownMenuLabel>
+        <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <span>
-              <UserIcon />
-            </span>
+          <DropdownMenuItem asChild>
             <Link href="/profile">Profile</Link>
           </DropdownMenuItem>
           <DropdownMenuItem
-            onClick={handleLogout}
-            className="text-red-500 cursor-pointer"
+            onClick={onLogout}
+            className="cursor-pointer text-red-500"
           >
-            <span>
-              <LogOutIcon />
-            </span>
+            <LogOutIcon className="mr-2 h-4 w-4" />
             Logout
           </DropdownMenuItem>
         </DropdownMenuGroup>
-        <DropdownMenuSeparator />
       </DropdownMenuContent>
     </DropdownMenu>
   );
@@ -51,30 +110,61 @@ function UserMenu({ handleLogout }: { handleLogout: () => void }) {
 
 function Navbar() {
   const router = useRouter();
+  const pathname = usePathname();
+  const { user } = useAuth();
 
   const handleLogout = async () => {
     await signOutFromGoogle();
-    router.push('/'); // Redirect to home after logout
+    router.push('/');
   };
+
   return (
-    <div className="bg-brand p-2 sticky top-0 z-50  ">
-      <div className="flex items-center justify-between gap-6">
-        <Link href="/" className="top-0 z-50 p-2">
+    <header className="sticky top-0 z-50 border-b border-border bg-background">
+      <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-2">
+        <Link href="/watchlist" className="shrink-0">
           <Image
-            src="/informiumText.png"
-            alt="Informium Logo"
+            src="/tikrchecklogo.png"
+            alt="TikrCheck Logo"
             height={30}
             width={100}
-            className=""
             priority
           />
         </Link>
-        <div className="max-w-5xl w-full">
+
+        <nav className="hidden items-center gap-1 md:flex">
+          {NAV_LINKS.map((link) => (
+            <NavLink
+              key={link.label}
+              href={link.href}
+              label={link.label}
+              pathname={pathname}
+            />
+          ))}
+        </nav>
+
+        <div className="mx-auto hidden max-w-md flex-1 md:block">
           <SearchBar />
         </div>
-        <UserMenu handleLogout={handleLogout} />
+
+        <div className="flex items-center gap-2">
+          <div className="hidden sm:block">
+            <MarketStatusPill />
+          </div>
+          <ThemeToggle />
+          {user && (
+            <UserAvatar
+              displayName={user.displayName}
+              photoURL={user.photoURL}
+              onLogout={handleLogout}
+            />
+          )}
+        </div>
       </div>
-    </div>
+
+      <div className="border-t border-border px-4 py-2 md:hidden">
+        <SearchBar />
+      </div>
+    </header>
   );
 }
 
