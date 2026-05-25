@@ -57,6 +57,7 @@ export function MarketIndexCards() {
             const quote = await fetchProfileQuote(idx.symbol, apiKey);
             return {
               label: idx.label,
+              symbol: idx.symbol,
               price: quote?.price ?? 0,
               changePercentage: quote?.changePercentage ?? 0,
             };
